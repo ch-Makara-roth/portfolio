@@ -1,0 +1,240 @@
+import { z } from 'zod';
+
+// Common validation schemas
+export const schemas = {
+  // Email validation
+  email: z.string().email('Invalid email format'),
+
+  // Password validation
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain uppercase, lowercase, and number'),
+
+  // Username validation
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .max(20, 'Username cannot exceed 20 characters')
+    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+
+  // Name validation
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name cannot exceed 50 characters')
+    .regex(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces'),
+
+  // UUID validation
+  uuid: z.string().uuid('Invalid UUID format'),
+
+  // URL validation
+  url: z.string().url('Invalid URL format'),
+
+  // Slug validation
+  slug: z
+    .string()
+    .min(3, 'Slug must be at least 3 characters')
+    .max(100, 'Slug cannot exceed 100 characters')
+    .regex(/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens'),
+
+  // Content validation
+  content: z.string().min(1, 'Content is required').max(10000, 'Content cannot exceed 10000 characters'),
+
+  // Title validation
+  title: z.string().min(1, 'Title is required').max(200, 'Title cannot exceed 200 characters'),
+
+  // Bio validation
+  bio: z.string().max(500, 'Bio cannot exceed 500 characters').optional(),
+
+  // Tags validation
+  tags: z.array(z.string().min(1).max(50)).max(10, 'Cannot have more than 10 tags'),
+
+  // Role validation
+  role: z.enum(['USER', 'ADMIN', 'MODERATOR']),
+
+  // Boolean validation
+  boolean: z.boolean(),
+
+  // Number validation
+  positiveInt: z.number().int().positive(),
+
+  // Pagination
+  page: z.number().int().min(1).default(1),
+  limit: z.number().int().min(1).max(100).default(10),
+
+  // Search query
+  search: z.string().min(1).max(100).optional(),
+
+  // Sort options
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  sortBy: z.string().optional()
+};
+
+// User validation schemas
+export const userValidation = {
+  // Register validation
+  register: z.object({
+    email: schemas.email,
+    username: schemas.username,
+    password: schemas.password,
+    firstName: schemas.name.optional(),
+    lastName: schemas.name.optional(),
+    bio: schemas.bio
+  }),
+
+  // Login validation
+  login: z.object({
+    email: schemas.email,
+    password: z.string().min(1, 'Password is required')
+  }),
+
+  // Update profile validation
+  updateProfile: z.object({
+    firstName: schemas.name.optional(),
+    lastName: schemas.name.optional(),
+    bio: schemas.bio,
+    avatar: schemas.url.optional()
+  }),
+
+  // Change password validation
+  changePassword: z.object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: schemas.password
+  })
+};
+
+// Post validation schemas
+export const postValidation = {
+  // Create post validation
+  create: z.object({
+    title: schemas.title,
+    content: schemas.content.optional(),
+    slug: schemas.slug,
+    published: schemas.boolean.default(false),
+    featured: schemas.boolean.default(false),
+    tags: schemas.tags.default([])
+  }),
+
+  // Update post validation
+  update: z.object({
+    title: schemas.title.optional(),
+    content: schemas.content.optional(),
+    slug: schemas.slug.optional(),
+    published: schemas.boolean.optional(),
+    featured: schemas.boolean.optional(),
+    tags: schemas.tags.optional()
+  }),
+
+  // Post query validation
+  query: z.object({
+    page: schemas.page,
+    limit: schemas.limit,
+    search: schemas.search,
+    tags: z.array(z.string()).optional(),
+    published: schemas.boolean.optional(),
+    featured: schemas.boolean.optional(),
+    sortBy: z.enum(['createdAt', 'updatedAt', 'title']).default('createdAt'),
+    sortOrder: schemas.sortOrder
+  })
+};
+
+// Comment validation schemas
+export const commentValidation = {
+  // Create comment validation
+  create: z.object({
+    content: schemas.content,
+    postId: schemas.uuid
+  }),
+
+  // Update comment validation
+  update: z.object({
+    content: schemas.content
+  })
+};
+
+// Query validation schemas
+export const queryValidation = {
+  // Pagination validation
+  pagination: z.object({
+    page: schemas.page,
+    limit: schemas.limit
+  }),
+
+  // Search validation
+  search: z.object({
+    query: schemas.search,
+    page: schemas.page,
+    limit: schemas.limit
+  }),
+
+  // ID param validation
+  id: z.object({
+    id: schemas.uuid
+  })
+};
+
+// Validation utility functions
+export const validate = {
+  // Validate data against schema
+  data<T>(schema: z.ZodSchema<T>, data: unknown): { success: true; data: T } | { success: false; errors: string[] } {
+    try {
+      const result = schema.safeParse(data);
+      if (result.success) {
+        return { success: true, data: result.data };
+      } else {
+        // Check if error exists and has issues property
+        if (result.error && result.error.issues) {
+          return {
+            success: false,
+            errors: result.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`)
+          };
+        } else {
+          // Fallback for unexpected error structure
+          console.error('Unexpected validation error structure:', result);
+          return {
+            success: false,
+            errors: ['Validation failed with unexpected error structure']
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error during validation:', error);
+      return {
+        success: false,
+        errors: ['Validation failed due to internal error']
+      };
+    }
+  },
+
+  // Sanitize HTML content
+  sanitizeHtml(html: string): string {
+    // Basic HTML sanitization - you might want to use a library like DOMPurify
+    return html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+="[^"]*"/gi, '')
+      .replace(/on\w+='[^']*'/gi, '');
+  },
+
+  // Generate slug from title
+  generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  },
+
+  // Check if email is valid
+  isValidEmail(email: string): boolean {
+    return schemas.email.safeParse(email).success;
+  },
+
+  // Check if UUID is valid
+  isValidUuid(uuid: string): boolean {
+    return schemas.uuid.safeParse(uuid).success;
+  }
+}; 
