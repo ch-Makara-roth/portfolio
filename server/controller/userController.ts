@@ -163,7 +163,7 @@ export class UserController {
   getUserById = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!validate.isValidUuid(id)) {
+    if (!validate.isValidCuid(id)) {
       return response.validationError(res, ['Invalid user ID']);
     }
 
@@ -205,7 +205,7 @@ export class UserController {
   deleteUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!validate.isValidUuid(id)) {
+    if (!validate.isValidCuid(id)) {
       return response.validationError(res, ['Invalid user ID']);
     }
 
@@ -232,7 +232,7 @@ export class UserController {
   reactivateAccount = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!validate.isValidUuid(id)) {
+    if (!validate.isValidCuid(id)) {
       return response.validationError(res, ['Invalid user ID']);
     }
 
@@ -280,7 +280,7 @@ export class UserController {
     const { id } = req.params;
     const { page = 1, limit = 10 } = req.query;
 
-    if (!validate.isValidUuid(id)) {
+    if (!validate.isValidCuid(id)) {
       return response.validationError(res, ['Invalid user ID']);
     }
 
@@ -305,7 +305,7 @@ export class UserController {
     const { id } = req.params;
     const { page = 1, limit = 10 } = req.query;
 
-    if (!validate.isValidUuid(id)) {
+    if (!validate.isValidCuid(id)) {
       return response.validationError(res, ['Invalid user ID']);
     }
 
@@ -333,7 +333,7 @@ export class UserController {
 
     const { id } = req.params;
 
-    if (!validate.isValidUuid(id)) {
+    if (!validate.isValidCuid(id)) {
       return response.validationError(res, ['Invalid user ID']);
     }
 
@@ -358,7 +358,7 @@ export class UserController {
 
     const { id } = req.params;
 
-    if (!validate.isValidUuid(id)) {
+    if (!validate.isValidCuid(id)) {
       return response.validationError(res, ['Invalid user ID']);
     }
 
