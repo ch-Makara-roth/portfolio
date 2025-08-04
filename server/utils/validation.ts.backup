@@ -170,7 +170,7 @@ export const queryValidation = {
 
   // ID param validation
   id: z.object({
-    id: schemas.cuid
+    id: schemas.uuid
   })
 };
 
@@ -234,7 +234,7 @@ export const validate = {
   },
 
   // Check if UUID is valid
-  isValidCuid(uuid: string): boolean {
-    return schemas.cuid.safeParse(uuid).success;
+  isValidUuid(uuid: string): boolean {
+    return schemas.uuid.safeParse(uuid).success;
   }
 }; 

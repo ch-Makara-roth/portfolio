@@ -6,6 +6,7 @@ import { response } from "./utils/response";
 import { errorHandler, notFoundHandler } from "./middleware/error";
 
 // Routes
+import postRoutes from "./routes/postRoutes";
 import userRoutes from "./routes/userRoutes";
 
 const app = express();
@@ -23,6 +24,7 @@ app.use((req: Request, res: Response, next) => {
 
 // API Routes
 app.use('/api/v1/users', userRoutes);
+app.use("/api/v1/posts", postRoutes);
 
 // Root endpoint
 app.get("/", (req: Request, res: Response) => {
@@ -34,6 +36,7 @@ app.get("/", (req: Request, res: Response) => {
     endpoints: {
       health: "/health",
       users: "/api/v1/users",
+      posts: "/api/v1/posts",
     },
   }, "API Server is running");
 });

@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio",
+    "db:seed": "bun run prisma/seed.ts",
     "docker:build": "docker build -t server .",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down"
