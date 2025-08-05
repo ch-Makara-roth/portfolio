@@ -55,3 +55,30 @@ npm run lint
 *   **Testing:** The `README.md` file mentions that changes should be tested thoroughly, but there is no specific testing framework configured in the `package.json`. It is recommended to add a testing framework like Jest or Playwright to ensure code quality.
 *   **Commits:** The `README.md` does not specify a commit message format, but it is recommended to use conventional commit standards to maintain a clear and consistent commit history.
 *   **Branching:** The `README.md` file suggests a contribution workflow that includes forking the repository, creating a feature branch, and submitting a pull request. This indicates a collaborative development model where changes are reviewed before being merged into the main branch.
+
+## Development Flow
+
+1.  **Create a New Branch:** Before making any changes, create a new feature branch from the `main` branch:
+
+    ```bash
+    git checkout -b feature/<your-feature-name>
+    ```
+
+2.  **Make Changes:** Implement your changes, ensuring they adhere to the project's coding style and conventions.
+
+3.  **Test Thoroughly:** Test your changes to ensure they work as expected and do not introduce any regressions.
+
+4.  **Commit Changes:** Commit your changes with a clear and descriptive commit message, following conventional commit standards.
+
+    ```bash
+    git add .
+    git commit -m "feat: add new feature"
+    ```
+
+5.  **Push to Remote:** Push your branch to the remote repository:
+
+    ```bash
+    git push -u origin feature/<your-feature-name>
+    ```
+
+6.  **Create a Pull Request:** Create a pull request on GitHub from your feature branch to the `main` branch. Provide a clear description of the changes and any relevant information for the reviewer.
