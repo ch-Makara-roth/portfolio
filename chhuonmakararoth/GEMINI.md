@@ -81,4 +81,4 @@ npm run lint
     git push -u origin feature/<your-feature-name>
     ```
 
-6.  **Create a Pull Request:** Create a pull request on GitHub from your feature branch to the `main` branch. Provide a clear description of the changes and any relevant information for the reviewer.
+6.  **Create a Pull Request:** After pushing your branch, you can create a pull request on the GitHub website. GitHub usually provides a direct link in the terminal output after a successful push. Alternatively, navigate to the repository on GitHub, where you will see a prompt to create a pull request from your recently pushed branch. Provide a clear description of the changes and any relevant information for the reviewer.
