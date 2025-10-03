@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Crawl-delay: 2
+
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Crawl-delay: 3
+
+User-agent: Applebot
+Allow: /
+Disallow: /api/
+
+Sitemap: https://your-domain.com/sitemap.xml 
