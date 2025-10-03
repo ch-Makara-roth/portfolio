@@ -42,13 +42,13 @@ export default function ProjectsPage() {
   const otherProjects = projects?.filter(project => !project.featured) || []
 
   return (
-    <div className="min-h-screen py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 sm:pb-20 md:pb-32 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12 sm:mb-16"
+          className="text-center sm:mb-16"
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 sm:mb-6 bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent px-2">
             Projects

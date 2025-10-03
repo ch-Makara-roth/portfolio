@@ -3,63 +3,69 @@
 import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
-import { Calendar, MapPin, Coffee, Code, Link, Download } from 'lucide-react'
+import { Calendar, MapPin, Coffee, Code, Link, Download, Phone, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-const skills = [
-  'React', 'Redux', 'Redux Toolkit', 'React Native', 'Next.js', 'TypeScript', 'JavaScript', 'Vue.js', 'Node.js',
-  'Laravel', 'PHP', 'Python', 'PostgreSQL', 'MongoDB', 'Cpanel',
-  'Docker', 'Vercel', 'Tailwind CSS', 'SCSS', 'Framer Motion',
-  'REST APIs', 'GraphQL', 'Socket.io', 'Git', 'Figma', 'Trello',
-]
-
-const experiences = [
-  {
-    role: 'Full Stack Developer',
-    type: 'Full Time',
-    company: 'Acmcert indochina (Cambodia) co.ltd',
-    period: '2024 - Present',
-    location: 'Phnom Penh, Cambodia',
-    skills: ['React', 'Next.js', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker', 'REST APIs', 'Tailwind CSS']
-  },
-  {
-    role: 'Frontend Developer',
-    type: 'Full Time ( Internship )',
-    company: 'Kilo IT',
-    period: '2023 - 2024',
-    location: 'Phnom Penh, Cambodia',
-    skills: ['React', 'Redux', 'JavaScript', 'Vue.js', 'SCSS', 'Git', 'Figma', 'REST APIs']
-  },
-  {
-    role: 'Game IT',
-    type: 'Full Time',
-    company: '32nd SEA Games & 12th ASEAN Para Games',
-    period: '5 - 16 June, 2023 &&  3 - 9 June, 2023',
-    location: 'Phnom Penh, Cambodia',
-    skills: ['JavaScript', 'PHP', 'Laravel', 'MongoDB', 'Socket.io', 'Git', 'Trello']
-  }
-]
-
-const education = [
-  {
-    degree: 'Bachelor of Computer Science',
-    school: 'Royal University of Phnom Penh',
-    period: '2020 - 2024',
-    location: 'Phnom Penh, Cambodia',
-    description: 'Major in Software Engineering'
-  },
-  {
-    degree: 'High School Diploma',
-    school: 'Preah Sisowath High School',
-    period: '2017 - 2020',
-    location: 'Phnom Penh, Cambodia',
-    description: 'Science Stream'
-  }
-]
+import { useState, useEffect } from 'react'
+import { AboutData } from '@/lib/mockData'
 
 export default function AboutPage() {
+  const [aboutData, setAboutData] = useState<AboutData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/about')
+        const result = await response.json()
+        
+        if (result.success) {
+          setAboutData(result.data)
+        } else {
+          setError(result.error || 'Failed to fetch about data')
+        }
+      } catch (err) {
+        setError('Failed to fetch about data')
+        console.error('Error fetching about data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAboutData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-dimmed">Loading about data...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !aboutData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-accent text-white rounded hover:bg-accent/80"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const { personalInfo, skills, experiences, education } = aboutData
   return (
-    <div className="min-h-screen py-6 sm:py-8 md:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen sm:pb-20 md:pb-32 py-6 sm:py-8 md:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -84,14 +90,14 @@ export default function AboutPage() {
           >
             <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 mx-auto lg:mx-0 mb-4 sm:mb-6 md:mb-8">
               <Image
-                src="https://via.placeholder.com/400x400?text=Makara"
-                alt="Chhuon Makara Roth - Full Stack Developer portrait"
+                src={personalInfo.profileImage}
+                alt={`${personalInfo.name} - ${personalInfo.title} portrait`}
                 fill
                 className="object-cover rounded-2xl"
                 sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, (max-width: 1024px) 256px, 320px"
                 priority
                 placeholder="blur"
-                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyEnyLFwzRQV0zFNHqZZLi6yIJhyZCFnJNUKs5lGF7hZm0fRYdDGrXSLDTJVuFZHhZuN7VGWwSzUFGwU4Kp/9k="
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyEnyLFwzRQV0zFNHqZZLi6yIJhyZCFnJNUKs5lGF7hZm0fRYdDGrXSLDTJVuFZHhZuN7VGWwSzUFGwU4Kp/9k="
               />
               <div className="absolute inset-0 bg-gradient-to-t from-accent/10 to-transparent rounded-2xl" />
             </div>
@@ -99,11 +105,19 @@ export default function AboutPage() {
             <div className="space-y-2 sm:space-y-3 md:space-y-4 text-center lg:text-left w-full">
               <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
                 <MapPin size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span>Phnom Penh, Cambodia</span>
+                <span>{personalInfo.location}</span>
+              </div>
+              <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
+                <Phone size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
+                <span>{personalInfo.phone}</span>
+              </div>
+              <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
+                <Mail size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
+                <span>{personalInfo.email}</span>
               </div>
               <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
                 <Calendar size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span>3+ Years Experience</span>
+                <span>Born: {personalInfo.birthDate}</span>
               </div>
               <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
                 <Coffee size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
@@ -111,7 +125,7 @@ export default function AboutPage() {
               </div>
               <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
                 <Code size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span className="text-center lg:text-left">Research, Learning, Music, Reading, Traveling</span>
+                <span className="text-center lg:text-left">{personalInfo.hobbies.join(', ')}</span>
               </div>
             </div>
           </motion.div>
@@ -124,25 +138,11 @@ export default function AboutPage() {
           >
             <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-accent mb-3 sm:mb-4 md:mb-6 text-center lg:text-left">My Story</h2>
             <div className="space-y-2 sm:space-y-3 md:space-y-4 text-text/80 leading-relaxed text-xs sm:text-sm md:text-base px-2 sm:px-0">
-              <p>
-                Hi! I'm Makara, a passionate full-stack developer with over 3 years of experience 
-                building modern web applications. I love creating intuitive user experiences and 
-                robust backend systems.
-              </p>
-              <p>
-                My journey started with a curiosity for how websites work, which led me to dive 
-                deep into JavaScript and modern web technologies. I've worked with startups and 
-                established companies, helping them bring their digital ideas to life.
-              </p>
-              <p>
-                When I'm not coding, you can find me exploring new technologies, contributing to 
-                open-source projects, or enjoying a good cup of coffee while reading about the 
-                latest in web development.
-              </p>
-              <p>
-                I believe in writing clean, maintainable code and creating user-centered solutions 
-                that make a real impact. Let's build something amazing together!
-              </p>
+              {personalInfo.story.map((paragraph, index) => (
+                <p key={index}>
+                  {paragraph}
+                </p>
+              ))}
             </div>
           </motion.div>
         </div>
@@ -497,4 +497,4 @@ export default function AboutPage() {
       </div>
     </div>
   )
-} 
+}

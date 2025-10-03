@@ -5,7 +5,7 @@ import { PostWithAuthor } from './BlogsPage'
 import Image from 'next/image'
 
 async function fetchPost(slug: string): Promise<PostWithAuthor> {
-  const response = await fetch(`http://localhost:3001/api/v1/posts/${slug}`)
+  const response = await fetch(`/api/v1/posts/${slug}`)
   if (!response.ok) {
     throw new Error('Failed to fetch post')
   }

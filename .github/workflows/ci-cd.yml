@@ -1,0 +1,264 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+  CACHE_KEY_PREFIX: 'node-deps'
+
+jobs:
+  # Continuous Integration
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.ref, 'refs/tags/')"
+    
+    strategy:
+      matrix:
+        node-version: [20]
+      fail-fast: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            .next/cache
+          key: ${{ env.CACHE_KEY_PREFIX }}-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json', '**/bun.lockb') }}
+          restore-keys: |
+            ${{ env.CACHE_KEY_PREFIX }}-${{ runner.os }}-node-${{ matrix.node-version }}-
+            ${{ env.CACHE_KEY_PREFIX }}-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          if [ -f "bun.lockb" ]; then
+            npm install -g bun
+            bun install
+          else
+            npm ci
+          fi
+
+      - name: Run ESLint
+        run: |
+          if [ -f "bun.lockb" ]; then
+            bun run lint
+          else
+            npm run lint
+          fi
+
+      - name: Run TypeScript check
+        run: |
+          if [ -f "bun.lockb" ]; then
+            bun run type-check || npx tsc --noEmit
+          else
+            npm run type-check || npx tsc --noEmit
+          fi
+
+      - name: Run tests with coverage
+        run: |
+          if [ -f "bun.lockb" ]; then
+            bun run test:coverage || bun test --coverage
+          else
+            npm run test:coverage || npm test -- --coverage --watchAll=false
+          fi
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+      - name: Build application
+        run: |
+          if [ -f "bun.lockb" ]; then
+            bun run build
+          else
+            npm run build
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-files-${{ github.sha }}
+          path: |
+            .next/
+            out/
+            dist/
+            build/
+          retention-days: 7
+
+  # Continuous Deployment
+  release:
+    name: Release & Deploy
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: []
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            .next/cache
+          key: ${{ env.CACHE_KEY_PREFIX }}-${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json', '**/bun.lockb') }}
+          restore-keys: |
+            ${{ env.CACHE_KEY_PREFIX }}-${{ runner.os }}-node-${{ env.NODE_VERSION }}-
+            ${{ env.CACHE_KEY_PREFIX }}-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          if [ -f "bun.lockb" ]; then
+            npm install -g bun
+            bun install
+          else
+            npm ci
+          fi
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -f "bun.lockb" ]; then
+            bun run semantic-release
+          else
+            npx semantic-release
+          fi
+
+      - name: Build production bundle
+        run: |
+          if [ -f "bun.lockb" ]; then
+            bun run build
+          else
+            npm run build
+          fi
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          # Create deployment directory if it doesn't exist
+          ssh $DEPLOY_USER@$DEPLOY_HOST "mkdir -p /var/www/html"
+          
+          # Backup current deployment
+          ssh $DEPLOY_USER@$DEPLOY_HOST "cp -r /var/www/html /var/www/html.backup.$(date +%Y%m%d_%H%M%S) || true"
+          
+          # Sync build files to server
+          if [ -d ".next" ]; then
+            rsync -avz --delete .next/ $DEPLOY_USER@$DEPLOY_HOST:/var/www/html/
+          elif [ -d "dist" ]; then
+            rsync -avz --delete dist/ $DEPLOY_USER@$DEPLOY_HOST:/var/www/html/
+          elif [ -d "build" ]; then
+            rsync -avz --delete build/ $DEPLOY_USER@$DEPLOY_HOST:/var/www/html/
+          elif [ -d "out" ]; then
+            rsync -avz --delete out/ $DEPLOY_USER@$DEPLOY_HOST:/var/www/html/
+          fi
+          
+          # Copy package.json and ecosystem.config.js if they exist
+          rsync -avz package.json $DEPLOY_USER@$DEPLOY_HOST:/var/www/ || true
+          rsync -avz ecosystem.config.js $DEPLOY_USER@$DEPLOY_HOST:/var/www/ || true
+
+      - name: Restart services
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          ssh $DEPLOY_USER@$DEPLOY_HOST << 'EOF'
+            # Restart PM2 if ecosystem file exists
+            if [ -f "/var/www/ecosystem.config.js" ]; then
+              cd /var/www
+              pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
+            fi
+            
+            # Restart Nginx
+            sudo systemctl reload nginx || sudo service nginx reload || true
+            
+            # Clean up old backups (keep last 5)
+            find /var/www -name "html.backup.*" -type d | sort -r | tail -n +6 | xargs rm -rf || true
+          EOF
+
+      - name: Deployment status notification
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful for tag ${{ github.ref_name }}"
+          else
+            echo "❌ Deployment failed for tag ${{ github.ref_name }}"
+          fi
+
+  # Health check after deployment
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: [release]
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Check application health
+        run: |
+          # Replace with your actual health check endpoint
+          # curl -f http://${{ secrets.DEPLOY_HOST }}/health || exit 1
+          echo "Health check placeholder - implement your specific health check"
+
+# Optional: Slack notification job
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [ci, release, health-check]
+    if: always() && (needs.ci.result == 'failure' || needs.release.result == 'failure')
+    
+    steps:
+      - name: Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"🚨 CI/CD Pipeline failed for ${{ github.repository }} - ${{ github.ref_name }}\"}" \
+            $SLACK_WEBHOOK_URL

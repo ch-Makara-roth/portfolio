@@ -52,7 +52,7 @@ export default function RootLayout({
         className={`${inter.className} bg-bg text-text font-fira min-h-screen safe-area-inset-top safe-area-inset-bottom`}
       >
         <QueryProvider>
-          <main className="pb-16 sm:pb-20 md:pb-24 safe-area-inset-top">
+          <main className="safe-area-inset-top">
             {children}
           </main>
           <ConditionalDockNavigation />

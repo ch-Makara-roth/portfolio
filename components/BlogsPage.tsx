@@ -3,11 +3,11 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { BlogPost as BlogPostComponent } from '@/components/BlogPost'
-import { Post, User } from '@/../server/generated/prisma'
+import { PostWithAuthor } from '@/lib/mockData'
 import { Button } from './ui/button'
 import { Loader2, ServerCrash } from 'lucide-react'
 
-export type PostWithAuthor = Post & { author: User; _count: { likes: number; comments: number } };
+export type { PostWithAuthor };
 
 async function fetchPosts({ pageParam = 1 }): Promise<{ posts: PostWithAuthor[], nextPage: number | null }> {
   const response = await fetch(`/api/mock-posts?page=${pageParam}&limit=2`)

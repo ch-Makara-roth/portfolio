@@ -3,9 +3,10 @@
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import ShinyText from '@/components/animations/ShinyText/ShinyText';
+import StarryBackground from '@/components/animations/StarryBackground';
 import Link from 'next/link'
 import { ArrowRight, Download } from 'lucide-react'
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function HomePage() {
   const [skills, setSkills] = useState([
@@ -16,9 +17,50 @@ export default function HomePage() {
     { category: 'Mobile', skills: 'React Native, Flutter, iOS' }
   ])
   
+  const [useStarryBackground, setUseStarryBackground] = useState(true)
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false)
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  
+  useEffect(() => {
+    // Check user's data preference and connection for video fallback
+    const prefersReducedData = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-data: reduce)').matches
+    const isSlowConnection = typeof navigator !== 'undefined' && (navigator as any).connection && (navigator as any).connection.effectiveType === 'slow-2g'
+    
+    // Default to starry background, but allow video as option
+    if (!prefersReducedData && !isSlowConnection && !useStarryBackground) {
+      const timer = setTimeout(() => {
+        setShouldLoadVideo(true)
+      }, 1000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [useStarryBackground])
+  
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto text-center">
+    <div className="h-screen flex items-center justify-center sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Starry Background - Default */}
+      {useStarryBackground && (
+        <StarryBackground 
+          speed={0.8}
+          starCount={150}
+          nebulaColor="#4a0e4f"
+          className="z-0"
+        />
+      )}
+      
+
+      
+      {/* Fallback background when video is not loaded */}
+      {!useStarryBackground && !isVideoLoaded && (
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 z-0"></div>
+      )}
+       
+
+      
+      {/* Overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/20 z-10"></div>
+      <div className="max-w-4xl mx-auto text-center relative z-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -99,4 +141,4 @@ export default function HomePage() {
       </div>
     </div>
   )
-} 
+}
