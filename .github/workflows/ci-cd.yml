@@ -175,20 +175,26 @@ jobs:
         run: |
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to VPS
+      - name: Deploy to Claw Cloud VPS
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
         run: |
-          # Create deployment directory if it doesn't exist
-          ssh $DEPLOY_USER@$DEPLOY_HOST "mkdir -p /var/www/html"
+          # Create deployment directories
+          ssh $DEPLOY_USER@$DEPLOY_HOST "mkdir -p /var/www/html /var/www/app /var/log/pm2"
           
           # Backup current deployment
           ssh $DEPLOY_USER@$DEPLOY_HOST "cp -r /var/www/html /var/www/html.backup.$(date +%Y%m%d_%H%M%S) || true"
           
-          # Sync build files to server
+          # Sync application files to Claw Cloud VPS
+          rsync -avz --delete --exclude='node_modules' --exclude='.git' \
+            ./ $DEPLOY_USER@$DEPLOY_HOST:/var/www/app/
+          
+          # Sync build files to web directory
           if [ -d ".next" ]; then
             rsync -avz --delete .next/ $DEPLOY_USER@$DEPLOY_HOST:/var/www/html/
+            # Copy static assets for Next.js
+            rsync -avz public/ $DEPLOY_USER@$DEPLOY_HOST:/var/www/html/public/ || true
           elif [ -d "dist" ]; then
             rsync -avz --delete dist/ $DEPLOY_USER@$DEPLOY_HOST:/var/www/html/
           elif [ -d "build" ]; then
@@ -196,28 +202,36 @@ jobs:
           elif [ -d "out" ]; then
             rsync -avz --delete out/ $DEPLOY_USER@$DEPLOY_HOST:/var/www/html/
           fi
-          
-          # Copy package.json and ecosystem.config.js if they exist
-          rsync -avz package.json $DEPLOY_USER@$DEPLOY_HOST:/var/www/ || true
-          rsync -avz ecosystem.config.js $DEPLOY_USER@$DEPLOY_HOST:/var/www/ || true
 
-      - name: Restart services
+      - name: Restart services on Claw Cloud
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
         run: |
           ssh $DEPLOY_USER@$DEPLOY_HOST << 'EOF'
-            # Restart PM2 if ecosystem file exists
-            if [ -f "/var/www/ecosystem.config.js" ]; then
-              cd /var/www
+            # Install dependencies on Claw Cloud VPS
+            cd /var/www/app
+            if [ -f "bun.lockb" ]; then
+              bun install --production
+            else
+              npm ci --production
+            fi
+            
+            # Restart PM2 processes
+            if [ -f "/var/www/app/ecosystem.config.js" ]; then
+              cd /var/www/app
               pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
             fi
             
-            # Restart Nginx
-            sudo systemctl reload nginx || sudo service nginx reload || true
+            # Restart web server (Nginx/Apache)
+            sudo systemctl reload nginx || sudo systemctl reload apache2 || sudo service nginx reload || true
             
             # Clean up old backups (keep last 5)
             find /var/www -name "html.backup.*" -type d | sort -r | tail -n +6 | xargs rm -rf || true
+            
+            # Set proper permissions for Claw Cloud
+            sudo chown -R www-data:www-data /var/www/html || true
+            sudo chmod -R 755 /var/www/html || true
           EOF
 
       - name: Deployment status notification

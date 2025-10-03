@@ -1,19 +1,20 @@
 module.exports = {
   apps: [
     {
-      // Next.js Application
+      // Next.js Application on Claw Cloud
       name: 'nextjs-app',
       script: 'npm',
       args: 'start',
-      cwd: '/var/www',
-      instances: 'max', // Use all available CPU cores
+      cwd: '/var/www/app',
+      instances: 2, // Optimized for Claw Cloud VPS resources
       exec_mode: 'cluster',
       
-      // Environment variables
+      // Environment variables for Claw Cloud
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        HOST: '0.0.0.0'
+        HOST: '0.0.0.0',
+        NEXT_TELEMETRY_DISABLED: 1
       },
       
       // Logging
@@ -81,18 +82,21 @@ module.exports = {
     }
   ],
   
-  // Deployment configuration
+  // Deployment configuration for Claw Cloud
   deploy: {
     production: {
-      user: 'deploy',
-      host: ['your-server-ip'],
+      user: 'root', // Default Claw Cloud user
+      host: ['your-claw-cloud-ip'],
       ref: 'origin/main',
       repo: 'git@github.com:username/repository.git',
-      path: '/var/www',
+      path: '/var/www/app',
       'pre-deploy-local': '',
-      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production',
-      'pre-setup': '',
-      'ssh_options': 'StrictHostKeyChecking=no'
+      'post-deploy': 'bun install --production && bun run build && pm2 reload ecosystem.config.js --env production',
+      'pre-setup': 'mkdir -p /var/www/app /var/log/pm2',
+      'ssh_options': 'StrictHostKeyChecking=no',
+      'env': {
+        'NODE_ENV': 'production'
+      }
     }
   }
 };
