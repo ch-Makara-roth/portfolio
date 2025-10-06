@@ -47,6 +47,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="format-detection" content="telephone=no" />
+        <meta name="ahrefs-site-verification" content="f43fe6af70c9d1572d89e0196a750c104ea2d87416d7ec4a5c88fbdb4f4667de" />
         <script 
           src="https://analytics.ahrefs.com/analytics.js" 
           data-key="BL3Y1qeH2bn5q10psOIeSw" 
