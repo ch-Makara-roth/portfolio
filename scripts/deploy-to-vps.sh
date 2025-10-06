@@ -238,7 +238,82 @@ EOF
     fi
 }
 
-
+upload_prebuilt_files() {
+    log_info "Uploading pre-built application files to VPS..."
+    
+    # Upload .next directory (pre-built on local machine)
+    if [ -d "$LOCAL_BUILD_DIR" ]; then
+        log_info "Uploading pre-built .next directory..."
+        sshpass -p "$VPS_PASSWORD" rsync -avz --quiet --compress-level=6 \
+            --exclude='cache/webpack' \
+            --exclude='*.map' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            "$LOCAL_BUILD_DIR/" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/.next/"
+        if [ $? -eq 0 ]; then
+            log_success "Pre-built .next directory uploaded successfully"
+        else
+            log_error "Failed to upload .next directory"
+            exit 1
+        fi
+    else
+        log_error "Pre-built .next directory not found at $LOCAL_BUILD_DIR"
+        log_error "Please run 'npm run build' or 'bun run build' locally first"
+        exit 1
+    fi
+    
+    # Upload public directory (static assets)
+    if [ -d "public" ]; then
+        log_info "Uploading static assets (public directory)..."
+        sshpass -p "$VPS_PASSWORD" rsync -avz --quiet --compress-level=6 \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            "public/" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/public/"
+        if [ $? -eq 0 ]; then
+            log_success "Static assets uploaded successfully"
+        else
+            log_error "Failed to upload public directory"
+            exit 1
+        fi
+    fi
+    
+    # Upload production node_modules (pre-installed locally)
+    if [ -d "$LOCAL_NODE_MODULES" ]; then
+        log_info "Uploading production dependencies (this may take a while)..."
+        sshpass -p "$VPS_PASSWORD" rsync -avz --quiet --compress-level=6 \
+            --exclude='*.cache' \
+            --exclude='.bin' \
+            --exclude='*.md' \
+            --exclude='*.txt' \
+            --exclude='test' \
+            --exclude='tests' \
+            --exclude='__tests__' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            "$LOCAL_NODE_MODULES/" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/node_modules/"
+        if [ $? -eq 0 ]; then
+            log_success "Production dependencies uploaded successfully"
+        else
+            log_error "Failed to upload node_modules directory"
+            exit 1
+        fi
+    else
+        log_warning "node_modules not found locally - dependencies will need to be installed on VPS"
+    fi
+    
+    # Upload essential configuration files
+    log_info "Uploading configuration files..."
+    sshpass -p "$VPS_PASSWORD" scp -q -o StrictHostKeyChecking=no "package.json" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/" 2>/dev/null
+    sshpass -p "$VPS_PASSWORD" scp -q -o StrictHostKeyChecking=no "next.config.js" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/" 2>/dev/null
+    
+    # Upload package-lock.json or bun.lockb if they exist
+    [ -f "package-lock.json" ] && sshpass -p "$VPS_PASSWORD" scp -q -o StrictHostKeyChecking=no "package-lock.json" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/" 2>/dev/null
+    [ -f "bun.lockb" ] && sshpass -p "$VPS_PASSWORD" scp -q -o StrictHostKeyChecking=no "bun.lockb" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/" 2>/dev/null
+    
+    if [ $? -eq 0 ]; then
+        log_success "Configuration files uploaded successfully"
+    else
+        log_error "Failed to upload some configuration files"
+        exit 1
+    fi
+}
 
 set_file_permissions() {
     log_info "Setting proper file permissions on VPS..."
