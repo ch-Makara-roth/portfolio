@@ -1,9 +1,28 @@
 #!/bin/bash
 
 # =============================================================================
-# Next.js VPS Deployment Script
+# Next.js VPS Deployment Script - Optimized for Low-Resource Servers
 # =============================================================================
-# This script securely uploads built Next.js files to a VPS server
+# This script deploys a Next.js application to a VPS server with limited resources.
+# It syncs the latest source code from GitHub and uploads pre-built files from
+# the local machine to avoid resource-intensive build operations on the VPS.
+#
+# 🚀 OPTIMIZATION FEATURES:
+# - No npm install/build operations on VPS (saves CPU/memory)
+# - Uses pre-built .next directory from local machine
+# - Compressed file transfers with rsync
+# - Excludes unnecessary files (tests, cache, source maps)
+# - Lightweight Git operations only
+#
+# Prerequisites:
+# - sshpass installed on local machine
+# - rsync installed on local machine  
+# - Git repository cloned on VPS at ~/repositories/portfolio
+# - SSH access to VPS configured
+# - Next.js application built locally (.next directory exists)
+# - Run 'npm run build' or 'bun run build' locally before deployment
+#
+# Usage: ./deploy-to-vps.sh
 # Author: Portfolio Deployment Script
 # Version: 1.0
 # =============================================================================
@@ -129,113 +148,67 @@ test_ssh_connection() {
 # Deployment Functions
 # =============================================================================
 
-pull_latest_code() {
-    log_info "Pulling latest code from GitHub ($GIT_BRANCH branch) on VPS..."
+sync_source_code() {
+    log_info "Syncing latest source code from GitHub repository..."
     
     sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no "$VPS_USER@$VPS_HOST" << EOF
-        # Navigate to repository directory
+        # Navigate to repository path
         cd $VPS_REPO_PATH || {
             echo "Error: Repository path $VPS_REPO_PATH not found!"
-            echo "Please ensure the repository is cloned at this location."
             exit 1
         }
         
-        # Check if we're in a git repository
+        # Verify it's a git repository
         if [ ! -d ".git" ]; then
-            echo "Error: Not a git repository. Please ensure $VPS_REPO_PATH is a valid git repository."
+            echo "Error: $VPS_REPO_PATH is not a git repository!"
             exit 1
         fi
         
+        # Lightweight git operations only
         echo "Fetching latest changes from origin..."
-        git fetch origin || {
-            echo "Error: Failed to fetch from origin"
-            exit 1
-        }
+        git fetch origin --quiet
         
-        # Check current branch
-        CURRENT_BRANCH=\$(git branch --show-current)
-        if [ "\$CURRENT_BRANCH" != "$GIT_BRANCH" ]; then
-            echo "Switching from \$CURRENT_BRANCH to $GIT_BRANCH branch..."
-            git checkout $GIT_BRANCH || {
-                echo "Error: Failed to checkout $GIT_BRANCH branch"
-                exit 1
-            }
+        # Switch to target branch if not already on it
+        current_branch=\$(git branch --show-current)
+        if [ "\$current_branch" != "$GIT_BRANCH" ]; then
+            echo "Switching to $GIT_BRANCH branch..."
+            git checkout $GIT_BRANCH --quiet
         fi
         
         # Pull latest changes
-        echo "Pulling latest changes from $GIT_BRANCH..."
-        git pull origin $GIT_BRANCH || {
-            echo "Error: Failed to pull latest changes from $GIT_BRANCH"
-            exit 1
-        }
+        echo "Pulling latest changes from origin/$GIT_BRANCH..."
+        git pull origin $GIT_BRANCH --quiet
         
-        # Get latest commit info
-        LATEST_COMMIT=\$(git log -1 --pretty=format:"%h - %s (%an, %ar)")
-        echo "✅ Code updated to latest commit: \$LATEST_COMMIT"
+        # Show latest commit
+        echo "Latest commit:"
+        git log -1 --oneline
         
-        # Copy updated files to deployment directory
-        echo "Copying updated files to deployment directory..."
-        rsync -av --exclude='.git' --exclude='node_modules' --exclude='.next' $VPS_REPO_PATH/ $VPS_DEPLOY_PATH/
+        # Create deployment directory if it doesn't exist
+        mkdir -p $VPS_DEPLOY_PATH
         
-        echo "Latest code pulled and copied successfully"
+        # Copy only essential source files (no build operations)
+        echo "Copying source files to deployment directory..."
+        rsync -av --quiet \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            --exclude='__tests__' \
+            --exclude='*.test.*' \
+            --exclude='*.spec.*' \
+            $VPS_REPO_PATH/ $VPS_DEPLOY_PATH/
+        
+        echo "Source code sync completed"
 EOF
     
     if [ $? -eq 0 ]; then
-        log_success "Latest code pulled from GitHub and copied to deployment directory"
+        log_success "Successfully synced latest source code"
     else
-        log_error "Failed to pull latest code from GitHub"
+        log_error "Failed to sync source code"
         exit 1
     fi
 }
 
-build_application_on_vps() {
-    log_info "Building Next.js application on VPS..."
-    
-    sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no "$VPS_USER@$VPS_HOST" << EOF
-        # Navigate to deployment directory
-        cd $VPS_DEPLOY_PATH || {
-            echo "Error: Deployment path $VPS_DEPLOY_PATH not found!"
-            exit 1
-        }
-        
-        # Install dependencies if package.json exists
-        if [ -f "package.json" ]; then
-            echo "Installing dependencies..."
-            if command -v bun &> /dev/null && [ -f "bun.lockb" ]; then
-                echo "Using Bun to install dependencies..."
-                bun install --production
-            elif command -v npm &> /dev/null; then
-                echo "Using npm to install dependencies..."
-                npm ci --production
-            else
-                echo "Error: Neither npm nor bun found on VPS"
-                exit 1
-            fi
-        fi
-        
-        # Build the application
-        echo "Building Next.js application..."
-        if command -v bun &> /dev/null && [ -f "bun.lockb" ]; then
-            echo "Using Bun to build..."
-            bun run build
-        elif command -v npm &> /dev/null; then
-            echo "Using npm to build..."
-            npm run build
-        else
-            echo "Error: Neither npm nor bun found on VPS"
-            exit 1
-        fi
-        
-        echo "Application built successfully"
-EOF
-    
-    if [ $? -eq 0 ]; then
-        log_success "Application built successfully on VPS"
-    else
-        log_error "Failed to build application on VPS"
-        exit 1
-    fi
-}
+
 
 prepare_vps_directory() {
     log_info "Preparing VPS directory structure..."
@@ -265,70 +238,7 @@ EOF
     fi
 }
 
-upload_build_files() {
-    log_info "Uploading Next.js build files and dependencies to VPS..."
-    
-    # Upload .next directory
-    log_info "Uploading .next build directory..."
-    sshpass -p "$VPS_PASSWORD" rsync -avz --progress --delete \
-        -e "ssh -o StrictHostKeyChecking=no" \
-        "$LOCAL_BUILD_DIR/" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/.next/"
-    
-    if [ $? -ne 0 ]; then
-        log_error "Failed to upload .next directory"
-        exit 1
-    fi
-    
-    # Upload node_modules directory
-    log_info "Uploading node_modules directory (this may take a while)..."
-    sshpass -p "$VPS_PASSWORD" rsync -avz --progress --delete \
-        -e "ssh -o StrictHostKeyChecking=no" \
-        "$LOCAL_NODE_MODULES/" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/node_modules/"
-    
-    if [ $? -ne 0 ]; then
-        log_error "Failed to upload node_modules directory"
-        exit 1
-    fi
-    
-    # Upload public directory if it exists
-    if [ -d "$LOCAL_PUBLIC_DIR" ]; then
-        log_info "Uploading public directory..."
-        sshpass -p "$VPS_PASSWORD" rsync -avz --progress \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            "$LOCAL_PUBLIC_DIR/" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/public/"
-        
-        if [ $? -ne 0 ]; then
-            log_error "Failed to upload public directory"
-            exit 1
-        fi
-    fi
-    
-    # Upload package.json if it exists
-    if [ -f "$LOCAL_PACKAGE_JSON" ]; then
-        log_info "Uploading package.json..."
-        sshpass -p "$VPS_PASSWORD" scp -o StrictHostKeyChecking=no \
-            "$LOCAL_PACKAGE_JSON" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/"
-        
-        if [ $? -ne 0 ]; then
-            log_error "Failed to upload package.json"
-            exit 1
-        fi
-    fi
-    
-    # Upload package-lock.json if it exists
-    if [ -f "$LOCAL_PACKAGE_LOCK" ]; then
-        log_info "Uploading package-lock.json..."
-        sshpass -p "$VPS_PASSWORD" scp -o StrictHostKeyChecking=no \
-            "$LOCAL_PACKAGE_LOCK" "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/"
-        
-        if [ $? -ne 0 ]; then
-            log_error "Failed to upload package-lock.json"
-            exit 1
-        fi
-    fi
-    
-    log_success "All files and dependencies uploaded successfully"
-}
+
 
 set_file_permissions() {
     log_info "Setting proper file permissions on VPS..."
@@ -364,7 +274,7 @@ EOF
 # =============================================================================
 
 deploy() {
-    log_info "Starting Next.js deployment to VPS with latest code from GitHub..."
+    log_info "Starting optimized Next.js deployment to VPS..."
     echo "=================================="
     echo "VPS Host: $VPS_HOST"
     echo "Deploy Path: $VPS_DEPLOY_PATH"
@@ -373,17 +283,25 @@ deploy() {
     echo "Local Build Dir: $LOCAL_BUILD_DIR"
     echo "Local Node Modules: $LOCAL_NODE_MODULES"
     echo "=================================="
+    echo "⚡ Optimized for low-resource VPS"
+    echo "📦 Using pre-built files from local machine"
+    echo "🚫 No build/install operations on VPS"
+    echo "=================================="
     
-    # Run all deployment steps
+    # Run optimized deployment steps
     check_dependencies
+    check_build_files
     test_ssh_connection
-    pull_latest_code
-    build_application_on_vps
+    sync_source_code
+    prepare_vps_directory
+    upload_prebuilt_files
     set_file_permissions
     
-    log_success "Deployment completed successfully!"
+    log_success "Optimized deployment completed successfully!"
     log_info "Your Next.js application has been deployed to: $VPS_HOST:$VPS_DEPLOY_PATH"
-    log_info "Latest code from GitHub $GIT_BRANCH branch has been pulled and built on VPS"
+    log_info "✅ Latest source code synced from GitHub $GIT_BRANCH branch"
+    log_info "✅ Pre-built files uploaded from local machine"
+    log_info "✅ No resource-intensive operations performed on VPS"
 }
 
 # =============================================================================
