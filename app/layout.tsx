@@ -47,6 +47,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="format-detection" content="telephone=no" />
+        <script 
+          src="https://analytics.ahrefs.com/analytics.js" 
+          data-key="BL3Y1qeH2bn5q10psOIeSw" 
+          async
+        />
       </head>
       <body
         className={`${inter.className} bg-bg text-text font-fira min-h-screen safe-area-inset-top safe-area-inset-bottom`}
