@@ -1,17 +1,26 @@
-# Next.js VPS Deployment Script
+# Next.js VPS Deployment Script - Optimized for Low-Resource Servers
 
-A secure deployment script for uploading built Next.js files to a VPS server using SSH.
+A secure and optimized deployment script for Next.js applications designed specifically for VPS servers with limited CPU, memory, and storage resources.
+
+## 🚀 Key Optimizations
+
+- **No VPS Build Operations**: Avoids `npm install` and `npm run build` on the server
+- **Pre-built File Transfer**: Uses locally built files to reduce VPS resource usage
+- **Compressed Transfers**: Optimized rsync with compression for faster uploads
+- **Lightweight Git Operations**: Minimal Git commands with `--quiet` flags
+- **Selective File Exclusion**: Skips unnecessary files (tests, cache, source maps)
+- **Resource-Conscious Design**: Perfect for low-spec VPS environments
 
 ## Features
 
-- ✅ Secure SSH connection with password authentication
-- ✅ Automatic build directory detection
-- ✅ File transfer with progress indication
-- ✅ Proper file permissions setup
-- ✅ Comprehensive error handling
-- ✅ Backup creation before deployment
-- ✅ Dependency validation
-- ✅ Connection testing
+- ✅ **Resource-Optimized**: No build/install operations on VPS
+- ✅ **GitHub Integration**: Syncs latest source code from repository
+- ✅ **Pre-built Deployment**: Uses locally built .next directory
+- ✅ **Secure SSH**: Password-based authentication with sshpass
+- ✅ **Compressed Transfers**: Efficient file synchronization with rsync
+- ✅ **Smart Exclusions**: Skips tests, cache, and development files
+- ✅ **Error Handling**: Comprehensive validation and error reporting
+- ✅ **Connection Testing**: Validates SSH connectivity before deployment
 
 ## Prerequisites
 
@@ -33,19 +42,36 @@ A secure deployment script for uploading built Next.js files to a VPS server usi
 
 3. **ssh** - SSH client (usually pre-installed)
 
-### Next.js Build and Dependencies
+### Local Build Requirements
 
-Ensure your Next.js application is built and dependencies are installed before running the deployment:
+⚠️ **IMPORTANT**: Build your application locally before deployment to avoid resource usage on VPS:
 
 ```bash
-# Install dependencies
+# Install dependencies locally
 npm install
+# or
+bun install
 
-# Build the application
+# Build the application locally
 npm run build
+# or  
+bun run build
 ```
 
-**Note**: The deployment script will transfer your local `node_modules` directory to the VPS. This ensures that all dependencies, including platform-specific binaries, are available on the server.
+### VPS Setup Requirements
+
+1. **Git Repository**: Ensure your project repository is cloned on the VPS:
+   ```bash
+   # On your VPS
+   cd ~/repositories
+   git clone https://github.com/your-username/your-repo.git portfolio
+   ```
+
+2. **Directory Structure**: The script expects this structure on your VPS:
+   ```
+   ~/repositories/portfolio/    # Git repository
+   /var/www/portfolio/         # Deployment directory
+   ```
 
 ## Usage
 
