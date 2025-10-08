@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { QueryProvider } from "@/components/QueryProvider";
 import { ConditionalDockNavigation } from "@/components/ConditionalDockNavigation";
 import { generateMetadata, generateStructuredData } from "@/lib/metadata";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,7 +44,8 @@ export default function RootLayout({
             __html: JSON.stringify(websiteStructuredData),
           }}
         />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/images/Logo/icon0.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="format-detection" content="telephone=no" />
@@ -63,6 +65,7 @@ export default function RootLayout({
           </main>
           <ConditionalDockNavigation />
         </QueryProvider>
+        <Analytics />
       </body>
     </html>
   );
