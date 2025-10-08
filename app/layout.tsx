@@ -50,6 +50,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="ahrefs-site-verification" content="f43fe6af70c9d1572d89e0196a750c104ea2d87416d7ec4a5c88fbdb4f4667de" />
+        <meta name="google-site-verification" content="E2xuGpkJrX7W9CRPK1KB7_Dnkbu2XFdAFBg_ZPB3u2k" />
         <script 
           src="https://analytics.ahrefs.com/analytics.js" 
           data-key="BL3Y1qeH2bn5q10psOIeSw" 
