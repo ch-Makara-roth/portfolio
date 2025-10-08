@@ -14,7 +14,7 @@ const nextConfig = {
   },
   
   // SEO optimizations
-  trailingSlash: false,
+  trailingSlash: true,
   generateEtags: true,
   
   // Bundle optimization
@@ -64,4 +64,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig 
+module.exports = nextConfig
