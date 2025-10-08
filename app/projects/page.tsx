@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { generateMetadata } from '@/lib/metadata'
-import ProjectsPage from '@/components/ProjectsPage'
+import { ProjectsPage } from '@/components/ProjectsPage'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Projects',
@@ -10,4 +10,4 @@ export const metadata: Metadata = generateMetadata({
 
 export default function Projects() {
   return <ProjectsPage />
-} 
+}
