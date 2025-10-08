@@ -23,7 +23,9 @@ export function generateMetadata({
 }): Metadata {
   const fullTitle = title ? `${title} | ${baseMetadata.title}` : baseMetadata.title
   const fullDescription = description || baseMetadata.description
-  const fullUrl = `${baseMetadata.siteUrl}${path}`
+  // Ensure consistent trailing slash handling
+  const normalizedPath = path === '' ? '/' : path.endsWith('/') ? path : `${path}/`
+  const fullUrl = `${baseMetadata.siteUrl}${normalizedPath}`
 
   return {
     title: fullTitle,
