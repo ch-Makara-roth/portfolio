@@ -1,6 +1,6 @@
 # Next.js VPS Deployment Script - Optimized for Low-Resource Servers
 
-testting git worktree
+ git worktree
 
 A secure and optimized deployment script for Next.js applications designed specifically for VPS servers with limited CPU, memory, and storage resources.
 
