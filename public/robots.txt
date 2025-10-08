@@ -16,4 +16,4 @@ User-agent: Applebot
 Allow: /
 Disallow: /api/
 
-Sitemap: https://your-domain.com/sitemap.xml 
+Sitemap: https://www.chhuonmakararoth.site/sitemap.xml

@@ -5,7 +5,7 @@ export const baseMetadata = {
   description: 'Portfolio of Makara, a full-stack developer specializing in modern web technologies including React, Next.js, TypeScript, and Node.js.',
   keywords: 'Makara, Chhuon Makara Roth, full-stack developer, React, Next.js, TypeScript, Node.js, web development, Cambodia developer, portfolio',
   author: 'Chhuon Makara Roth',
-  siteUrl: 'https://your-domain.com', // Replace with your actual domain
+  siteUrl: 'https://www.chhuonmakararoth.site',
 }
 
 export function generateMetadata({
@@ -114,9 +114,8 @@ export function generateStructuredData(type: 'person' | 'website' | 'article' | 
         description: 'Full-stack developer specializing in modern web technologies',
         url: baseMetadata.siteUrl,
         sameAs: [
-          'https://github.com/your-github',
-          'https://linkedin.com/in/your-linkedin',
-          'https://twitter.com/your-twitter',
+          'https://github.com/ch-Makara-roth',
+          'https://www.linkedin.com/in/chhuon-makararoth-b66700262/',
         ],
         knowsAbout: [
           'JavaScript',
@@ -190,4 +189,4 @@ export function generateStructuredData(type: 'person' | 'website' | 'article' | 
     default:
       return baseStructuredData
   }
-} 
+}
