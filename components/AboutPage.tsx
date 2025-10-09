@@ -65,7 +65,7 @@ export default function AboutPage() {
 
   const { personalInfo, skills, experiences, education } = aboutData
   return (
-    <div className="min-h-screen sm:pb-20 md:pb-32 py-6 sm:py-8 md:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12 lg:py-16">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
