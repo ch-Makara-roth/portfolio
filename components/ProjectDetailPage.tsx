@@ -20,7 +20,7 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg via-bg/95 to-bg/90">
+    <div className="min-h-screen max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-bg via-bg/95 to-bg/90">
       {/* Navigation Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}

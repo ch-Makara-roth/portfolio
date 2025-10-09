@@ -9,12 +9,14 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Github, Linkedin, Mail, Phone, MapPin, Send } from 'lucide-react'
+import { Turnstile } from '@marsidev/react-turnstile'
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   subject: z.string().min(5, 'Subject must be at least 5 characters'),
   message: z.string().min(20, 'Message must be at least 20 characters'),
+  turnstileToken: z.string().min(1, 'Please complete the security verification'),
 })
 
 type ContactForm = z.infer<typeof contactSchema>
@@ -64,12 +66,17 @@ const contactInfo = [
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [turnstileToken, setTurnstileToken] = useState<string>('')
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactForm>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<ContactForm>({
     resolver: zodResolver(contactSchema)
   })
 
   const onSubmit = async (data: ContactForm) => {
+    if (!turnstileToken) {
+      return
+    }
+
     setIsSubmitting(true)
     setSubmitStatus('idle')
     
@@ -79,12 +86,16 @@ export default function ContactPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          turnstileToken
+        }),
       })
 
       if (response.ok) {
         setSubmitStatus('success')
         reset()
+        setTurnstileToken('')
       } else {
         setSubmitStatus('error')
       }
@@ -168,9 +179,34 @@ export default function ContactPage() {
                   )}
                 </div>
 
+                <div>
+                  <Turnstile
+                    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                    options={{
+                      theme: "dark"
+                    }}
+                    onSuccess={(token) => {
+                      setTurnstileToken(token)
+                      setValue('turnstileToken', token)
+                    }}
+                    onError={() => {
+                      setTurnstileToken('')
+                      setValue('turnstileToken', '')
+                    }}
+                    onExpire={() => {
+                      setTurnstileToken('')
+                      setValue('turnstileToken', '')
+                    }}
+                    className="flex justify-center"
+                  />
+                  {errors.turnstileToken && (
+                    <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.turnstileToken.message}</p>
+                  )}
+                </div>
+
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !turnstileToken}
                   className="w-full bg-accent hover:bg-accent/80 text-bg font-semibold py-2.5 sm:py-3 md:py-4 rounded-xl disabled:opacity-50 text-sm sm:text-base min-h-[44px] sm:min-h-[48px]"
                 >
                   {isSubmitting ? (
@@ -277,4 +313,4 @@ export default function ContactPage() {
       </div>
     </div>
   )
-} 
+}

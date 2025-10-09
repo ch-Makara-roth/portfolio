@@ -25,8 +25,8 @@ export function ProjectsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-bg via-bg to-bg/95 py-16 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      // <div className="min-h-screen bg-gradient-to-br from-bg via-bg to-bg/95 py-16 sm:py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">a
           <div className="text-center">
             <motion.div
               animate={{ rotate: 360 }}
@@ -36,7 +36,7 @@ export function ProjectsPage() {
             <p className="text-dimmed">Loading amazing projects...</p>
           </div>
         </div>
-      </div>
+      // </div>
     )
   }
 
@@ -60,7 +60,7 @@ export function ProjectsPage() {
   const otherProjects = filteredProjects.filter(project => !project.featured)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg via-bg to-bg/95 py-16 sm:py-20">
+    <div className="min-h-screen max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-bg via-bg to-bg/95 py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div

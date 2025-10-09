@@ -38,7 +38,7 @@ export default function HomePage() {
   }, [useStarryBackground])
   
   return (
-    <div className="h-screen flex items-center justify-center sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="h-screen flex items-center justify-center max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Starry Background - Default */}
       {useStarryBackground && (
         <StarryBackground 
