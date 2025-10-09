@@ -7,11 +7,11 @@ import { Home, FolderOpen, User, Briefcase, Mail, Book } from 'lucide-react'
 
 const navItems = [
   { href: '/', icon: Home, label: 'Home' },
-  { href: '/projects', icon: FolderOpen, label: 'Projects' },
-  { href: '/about', icon: User, label: 'About' },
-  { href: '/services', icon: Briefcase, label: 'Services' },
-  { href: '/contact', icon: Mail, label: 'Contact' },
-  { href: '/blogs', icon: Book, label: 'Blogs' },
+  { href: '/projects/', icon: FolderOpen, label: 'Projects' },
+  { href: '/about/', icon: User, label: 'About' },
+  { href: '/services/', icon: Briefcase, label: 'Services' },
+  { href: '/contact/', icon: Mail, label: 'Contact' },
+  { href: '/blogs/', icon: Book, label: 'Blogs' },
 ]
 
 export function DockNavigation() {
