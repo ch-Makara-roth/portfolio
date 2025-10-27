@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Search, Filter, X, Grid, List, SortAsc, SortDesc } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Project } from '@/app/api/projects/route'
 
 interface ProjectFilterProps {
@@ -73,7 +73,7 @@ export function ProjectFilter({ projects, onFilteredProjects, onViewModeChange, 
   }, [projects, searchTerm, selectedTechs, showFeaturedOnly, sortBy])
 
   // Update parent component when filtered projects change
-  useMemo(() => {
+  useEffect(() => {
     onFilteredProjects(filteredProjects)
   }, [filteredProjects, onFilteredProjects])
 
@@ -151,7 +151,7 @@ export function ProjectFilter({ projects, onFilteredProjects, onViewModeChange, 
           </select>
 
           {/* View Mode Toggle */}
-          <div className="flex border border-dimmed/20 rounded-xl overflow-hidden bg-bg/40 backdrop-blur-sm">
+          <div className="hidden sm:flex border border-dimmed/20 rounded-xl overflow-hidden bg-bg/40 backdrop-blur-sm">
             <button
               onClick={() => {
                 setViewMode('grid')

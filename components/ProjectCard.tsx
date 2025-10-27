@@ -31,7 +31,7 @@ export function ProjectCard({ project, viewMode = 'grid' }: ProjectCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`group relative bg-gradient-to-br from-bg/80 via-bg/60 to-bg/40 backdrop-blur-xl border border-dimmed/20 rounded-2xl overflow-hidden hover:border-accent/30 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/10 ${
-        viewMode === 'list' ? 'flex flex-row' : ''
+        viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''
       }`}
     >
       {/* Glow Effect */}
@@ -51,7 +51,7 @@ export function ProjectCard({ project, viewMode = 'grid' }: ProjectCardProps) {
       <div 
         className={`relative overflow-hidden cursor-pointer group/image ${
           viewMode === 'list' 
-            ? 'w-80 h-48 flex-shrink-0 rounded-l-2xl' 
+            ? 'w-full h-48 sm:w-80 sm:h-48 flex-shrink-0 sm:rounded-l-2xl rounded-t-2xl sm:rounded-t-none' 
             : 'h-48 sm:h-56'
         }`}
         onClick={handleNavigateToProject}
@@ -68,14 +68,14 @@ export function ProjectCard({ project, viewMode = 'grid' }: ProjectCardProps) {
         {/* Multi-layer Gradient Overlays */}
         <div className={`absolute inset-0 ${
           viewMode === 'list' 
-            ? 'bg-gradient-to-r from-transparent via-bg/10 to-bg/30' 
+            ? 'bg-gradient-to-b sm:bg-gradient-to-r from-transparent via-bg/10 to-bg/30' 
             : 'bg-gradient-to-t from-bg/90 via-bg/20 to-transparent'
         }`} />
         <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
         {/* Floating Action Buttons */}
         <div className={`absolute flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 ${
-          viewMode === 'list' ? 'top-4 left-4' : 'top-4 right-4'
+          viewMode === 'list' ? 'top-4 right-4 sm:left-4' : 'top-4 right-4'
         }`}>
           <motion.div
             whileHover={{ scale: 1.1 }}
@@ -95,23 +95,23 @@ export function ProjectCard({ project, viewMode = 'grid' }: ProjectCardProps) {
       </div>
 
       {/* Content */}
-      <div className={`space-y-4 ${viewMode === 'list' ? 'p-6 flex-1' : 'p-6'}`}>
-        {/* Title */}
+      <div className={`space-y-4 ${viewMode === 'list' ? 'p-4 sm:p-6 flex-1' : 'p-6'}`}>
         <h3 
-          className="text-xl font-bold text-text group-hover:text-accent transition-colors duration-300 cursor-pointer line-clamp-2"
+          className={`font-bold text-text group-hover:text-accent transition-colors duration-300 cursor-pointer line-clamp-2 ${
+            viewMode === 'list' ? 'text-lg sm:text-xl' : 'text-xl'
+          }`}
           onClick={handleNavigateToProject}
         >
           {project.title}
         </h3>
-
-        {/* Description */}
-        <p className="text-dimmed text-sm leading-relaxed line-clamp-3 group-hover:text-text/80 transition-colors duration-300">
+        <p className={`text-dimmed leading-relaxed line-clamp-3 group-hover:text-text/80 transition-colors duration-300 ${
+          viewMode === 'list' ? 'text-xs sm:text-sm' : 'text-sm'
+        }`}>
           {project.description}
         </p>
 
-        {/* Tech Stack */}
         <div className="flex flex-wrap gap-2">
-          {project.techStack.slice(0, 4).map((tech, index) => (
+          {project.techStack.slice(0, viewMode === 'list' ? 3 : 4).map((tech, index) => (
             <Badge
               key={index}
               variant="secondary"
@@ -120,18 +120,18 @@ export function ProjectCard({ project, viewMode = 'grid' }: ProjectCardProps) {
               {tech}
             </Badge>
           ))}
-          {project.techStack.length > 4 && (
+          {project.techStack.length > (viewMode === 'list' ? 3 : 4) && (
             <Badge
               variant="secondary"
               className="text-xs bg-dimmed/20 text-dimmed border-dimmed/30"
             >
-              +{project.techStack.length - 4}
+              +{project.techStack.length - (viewMode === 'list' ? 3 : 4)}
             </Badge>
           )}
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 pt-2">
+        <div className={`flex gap-2 sm:gap-3 pt-2 ${viewMode === 'list' ? 'flex-col xs:flex-row' : ''}`}>
           {project.githubUrl && (
             <Button
               variant="outline"

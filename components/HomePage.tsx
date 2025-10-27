@@ -20,12 +20,19 @@ export default function HomePage() {
   const [useStarryBackground, setUseStarryBackground] = useState(true)
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false)
   const [isVideoLoaded, setIsVideoLoaded] = useState(false)
+  const [isClient, setIsClient] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+  
+  useEffect(() => {
+    if (!isClient) return
+    
     // Check user's data preference and connection for video fallback
-    const prefersReducedData = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-data: reduce)').matches
-    const isSlowConnection = typeof navigator !== 'undefined' && (navigator as any).connection && (navigator as any).connection.effectiveType === 'slow-2g'
+    const prefersReducedData = window.matchMedia('(prefers-reduced-data: reduce)').matches
+    const isSlowConnection = (navigator as any).connection && (navigator as any).connection.effectiveType === 'slow-2g'
     
     // Default to starry background, but allow video as option
     if (!prefersReducedData && !isSlowConnection && !useStarryBackground) {
@@ -35,7 +42,7 @@ export default function HomePage() {
       
       return () => clearTimeout(timer)
     }
-  }, [useStarryBackground])
+  }, [useStarryBackground, isClient])
   
   return (
     <div className="h-screen flex items-center justify-center max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
