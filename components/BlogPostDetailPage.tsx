@@ -4,11 +4,13 @@ import { useQuery } from '@tanstack/react-query'
 import { PostWithAuthor } from './BlogsPage'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Calendar, Clock, Eye, Heart, MessageCircle, Share2, User } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, Eye, Heart, MessageCircle, Share2, User, Facebook, Twitter, Linkedin, Send as Telegram, Copy } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { MarkdownRenderer } from './MarkdownRenderer'
+import { PostRecommendations } from './PostRecommendations'
+import { useState, useEffect, useRef } from 'react'
 
 async function fetchPost(slug: string): Promise<PostWithAuthor> {
   const response = await fetch(`/api/v1/posts/${slug}`)
@@ -20,10 +22,122 @@ async function fetchPost(slug: string): Promise<PostWithAuthor> {
 }
 
 const BlogPostDetailPage = ({ slug }: { slug: string }) => {
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const shareMenuRef = useRef<HTMLDivElement>(null)
+
   const { data: post, isLoading, error } = useQuery({
     queryKey: ['post', slug],
     queryFn: () => fetchPost(slug),
   })
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+        setShowShareMenu(false)
+      }
+    }
+
+    if (showShareMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showShareMenu])
+
+  const getPostUrl = () => {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/blogs/${slug}`
+    }
+    return `${process.env.NEXT_PUBLIC_SITE_URL || 'https://yoursite.com'}/blogs/${slug}`
+  }
+
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowShareMenu(!showShareMenu)
+  }
+
+  const shareToFacebook = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = encodeURIComponent(getPostUrl())
+      const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`
+      window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to share to Facebook:', error)
+    }
+  }
+
+  const shareToTwitter = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = encodeURIComponent(getPostUrl())
+      const text = encodeURIComponent(`${post?.title} - Check out this blog post!`)
+      const shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`
+      window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to share to Twitter:', error)
+    }
+  }
+
+  const shareToLinkedIn = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = encodeURIComponent(getPostUrl())
+      const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
+      window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to share to LinkedIn:', error)
+    }
+  }
+
+  const shareToTelegram = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = encodeURIComponent(getPostUrl())
+      const text = encodeURIComponent(post?.title || '')
+      const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`
+      window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to share to Telegram:', error)
+    }
+  }
+
+  const copyLink = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = getPostUrl()
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url)
+      } else {
+        const textArea = document.createElement('textarea')
+        textArea.value = url
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+        textArea.remove()
+      }
+      setShowShareMenu(false)
+      console.log('Link copied to clipboard')
+    } catch (err) {
+      console.error('Failed to copy link:', err)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -129,10 +243,65 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
               <Heart size={16} className="mr-2 group-hover:text-red-500 transition-colors" />
               Like
             </Button>
-            <Button variant="outline" size="sm" className="group">
-              <Share2 size={16} className="mr-2 group-hover:text-accent transition-colors" />
-              Share
-            </Button>
+            <div className="relative" ref={shareMenuRef}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="group"
+                onClick={handleShareClick}
+              >
+                <Share2 size={16} className="mr-2 group-hover:text-accent transition-colors" />
+                Share
+              </Button>
+              
+              {showShareMenu && (
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2 z-10 min-w-[200px]">
+                  <div className="space-y-1">
+                    <button
+                      onClick={shareToFacebook}
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                    >
+                      <Facebook className="h-4 w-4 text-blue-600" />
+                      <span>Share on Facebook</span>
+                    </button>
+                    
+                    <button
+                      onClick={shareToTwitter}
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                    >
+                      <Twitter className="h-4 w-4 text-blue-400" />
+                      <span>Share on X</span>
+                    </button>
+                    
+                    <button
+                      onClick={shareToLinkedIn}
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                    >
+                      <Linkedin className="h-4 w-4 text-blue-700" />
+                      <span>Share on LinkedIn</span>
+                    </button>
+                    
+                    <button
+                      onClick={shareToTelegram}
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                    >
+                      <Telegram className="h-4 w-4 text-blue-500" />
+                      <span>Share on Telegram</span>
+                    </button>
+                    
+                    <div className="border-t border-gray-700 my-1"></div>
+                    
+                    <button
+                      onClick={copyLink}
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                    >
+                      <Copy className="h-4 w-4 text-gray-400" />
+                      <span>Copy link</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </motion.header>
 
@@ -180,9 +349,72 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
                 <MessageCircle size={16} className="mr-2" />
                 Comment ({post._count.comments})
               </Button>
+              <div className="relative" ref={shareMenuRef}>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleShareClick}
+                >
+                  <Share2 size={16} className="mr-2" />
+                  Share
+                </Button>
+                
+                {showShareMenu && (
+                  <div className="absolute bottom-full right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2 z-10 min-w-[200px]">
+                    <div className="space-y-1">
+                      <button
+                        onClick={shareToFacebook}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                      >
+                        <Facebook className="h-4 w-4 text-blue-600" />
+                        <span>Share on Facebook</span>
+                      </button>
+                      
+                      <button
+                        onClick={shareToTwitter}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                      >
+                        <Twitter className="h-4 w-4 text-blue-400" />
+                        <span>Share on X</span>
+                      </button>
+                      
+                      <button
+                        onClick={shareToLinkedIn}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                      >
+                        <Linkedin className="h-4 w-4 text-blue-700" />
+                        <span>Share on LinkedIn</span>
+                      </button>
+                      
+                      <button
+                        onClick={shareToTelegram}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                      >
+                        <Telegram className="h-4 w-4 text-blue-500" />
+                        <span>Share on Telegram</span>
+                      </button>
+                      
+                      <div className="border-t border-gray-700 my-1"></div>
+                      
+                      <button
+                        onClick={copyLink}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                      >
+                        <Copy className="h-4 w-4 text-gray-400" />
+                        <span>Copy link</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </motion.footer>
+        
+        <PostRecommendations 
+          currentPost={post} 
+          className="mt-16 border-t border-dimmed/20 pt-16"
+        />
       </div>
     </div>
   )

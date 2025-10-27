@@ -4,8 +4,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { PostWithAuthor } from '@/lib/mockData'
-import { Heart, MessageCircle, Repeat2, Share, Bookmark, MoreHorizontal, Send, User } from 'lucide-react'
-import { useState } from 'react'
+import { Heart, MessageCircle, Repeat2, Share, Bookmark, MoreHorizontal, Send, User, Facebook, Twitter, Linkedin, Send as Telegram, Copy, Link2, Edit, Trash2, Flag, Eye, EyeOff } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
 
 interface Comment {
   id: string
@@ -27,6 +27,108 @@ export const BlogPost = ({ post }: BlogPostProps) => {
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
   const [commentCount, setCommentCount] = useState(post._count?.comments || 0)
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [isHidden, setIsHidden] = useState(() => {
+    // Check localStorage on component initialization
+    if (typeof window !== 'undefined') {
+      try {
+        const hiddenPosts = localStorage.getItem('hiddenPosts')
+        const hiddenPostIds = hiddenPosts ? JSON.parse(hiddenPosts) : []
+        return hiddenPostIds.includes(post.id)
+      } catch (error) {
+        console.error('Error reading hidden posts from localStorage:', error)
+        return false
+      }
+    }
+    return false
+  })
+  const shareMenuRef = useRef<HTMLDivElement>(null)
+  const moreMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+        setShowShareMenu(false)
+      }
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+        setShowMoreMenu(false)
+      }
+    }
+
+    if (showShareMenu || showMoreMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showShareMenu, showMoreMenu])
+
+  const getHiddenPosts = (): string[] => {
+    try {
+      if (typeof window !== 'undefined') {
+        const hiddenPosts = localStorage.getItem('hiddenPosts')
+        return hiddenPosts ? JSON.parse(hiddenPosts) : []
+      }
+      return []
+    } catch (error) {
+      console.error('Error reading hidden posts from localStorage:', error)
+      return []
+    }
+  }
+
+  const saveHiddenPosts = (hiddenPosts: string[]): void => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('hiddenPosts', JSON.stringify(hiddenPosts))
+      }
+    } catch (error) {
+      console.error('Error saving hidden posts to localStorage:', error)
+    }
+  }
+
+  const addHiddenPost = (postId: string): void => {
+    const hiddenPosts = getHiddenPosts()
+    if (!hiddenPosts.includes(postId)) {
+      hiddenPosts.push(postId)
+      saveHiddenPosts(hiddenPosts)
+    }
+  }
+
+  const removeHiddenPost = (postId: string): void => {
+    const hiddenPosts = getHiddenPosts()
+    const updatedHiddenPosts = hiddenPosts.filter(id => id !== postId)
+    saveHiddenPosts(updatedHiddenPosts)
+  }
+
+  // If post is hidden, show a minimal placeholder
+  if (isHidden) {
+    return (
+      <motion.div
+        className="p-4 bg-gray-900/10 border border-gray-800/50 rounded-xl mb-4 opacity-50"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 0.5, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <EyeOff className="h-5 w-5 text-gray-500" />
+            <span className="text-gray-500 text-sm">Post hidden</span>
+          </div>
+          <button
+            onClick={() => {
+              setIsHidden(false)
+              removeHiddenPost(post.id)
+            }}
+            className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+          >
+            Show post
+          </button>
+        </div>
+      </motion.div>
+    )
+  }
 
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -70,12 +172,142 @@ export const BlogPost = ({ post }: BlogPostProps) => {
     e.stopPropagation()
   }
 
-  // Extract preview text from content (remove markdown)
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowMoreMenu(!showMoreMenu)
+  }
+
+  const handleEditPost = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log('Edit post:', post.id)
+    setShowMoreMenu(false)
+  }
+
+  const handleDeletePost = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (confirm('Are you sure you want to delete this post?')) {
+      console.log('Delete post:', post.id)
+    }
+    setShowMoreMenu(false)
+  }
+
+  const handleReportPost = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log('Report post:', post.id)
+    setShowMoreMenu(false)
+  }
+
+  const handleHidePost = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsHidden(true)
+    addHiddenPost(post.id)
+    setShowMoreMenu(false)
+    console.log('Post hidden:', post.title)
+  }
+
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowShareMenu(!showShareMenu)
+  }
+
+  const getPostUrl = () => {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/blogs/${post.slug}`
+    }
+    return `${process.env.NEXT_PUBLIC_SITE_URL || 'https://yoursite.com'}/blogs/${post.slug}`
+  }
+
+  const shareToFacebook = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = encodeURIComponent(getPostUrl())
+      const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`
+      window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to share to Facebook:', error)
+    }
+  }
+
+  const shareToTwitter = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = encodeURIComponent(getPostUrl())
+      const text = encodeURIComponent(`${post.title} - Check out this blog post!`)
+      const shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`
+      window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to share to Twitter:', error)
+    }
+  }
+
+  const shareToLinkedIn = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = encodeURIComponent(getPostUrl())
+      const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
+      window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to share to LinkedIn:', error)
+    }
+  }
+
+  const shareToTelegram = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = encodeURIComponent(getPostUrl())
+      const text = encodeURIComponent(post.title)
+      const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`
+      window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to share to Telegram:', error)
+    }
+  }
+
+  const copyLink = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    try {
+      const url = getPostUrl()
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url)
+      } else {
+        const textArea = document.createElement('textarea')
+        textArea.value = url
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+        textArea.remove()
+      }
+      setShowShareMenu(false)
+      console.log('Link copied to clipboard')
+    } catch (err) {
+      console.error('Failed to copy link:', err)
+    }
+  }
+
   const getPreviewText = (content: string) => {
     return content
-      .replace(/[#*`_~\[\]()]/g, '') // Remove markdown characters
-      .replace(/\n/g, ' ') // Replace newlines with spaces
-      .substring(0, 200) // Limit to 200 characters
+      .replace(/[#*`_~\[\]()]/g, '')
+      .replace(/\n/g, ' ') 
+      .substring(0, 200)
       .trim()
   }
 
@@ -109,14 +341,12 @@ export const BlogPost = ({ post }: BlogPostProps) => {
       transition={{ duration: 0.3 }}
     >
       <div className="space-y-1">
-        {/* Content Card */}
         <Link href={`/blogs/${post.slug}`} className="block">
           <motion.article
             className="p-4 bg-gray-900/50 border border-gray-700 rounded-lg hover:bg-gray-900/70 transition-colors cursor-pointer"
             whileHover={{ backgroundColor: 'rgba(17, 24, 39, 0.8)' }}
           >
             <div className="flex space-x-3">
-              {/* Author Avatar */}
               <div className="flex-shrink-0">
                 <Image
                   src={post.author.avatar || '/avatars/default.png'}
@@ -127,29 +357,52 @@ export const BlogPost = ({ post }: BlogPostProps) => {
                 />
               </div>
 
-              {/* Post Content */}
               <div className="flex-1 min-w-0">
-                {/* Author Info and Actions */}
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-medium text-white text-sm">
-                      {post.author.username}
-                    </span>
-                    <span className="text-gray-500 text-sm">
-                      @{post.author.username}
-                    </span>
-                    <span className="text-gray-500 text-sm">·</span>
-                    <span className="text-gray-500 text-sm">
-                      {formatDate(post.createdAt)}
-                    </span>
+                  <div className="flex flex-col sm:flex-row sm:items-center items-start space-y-1 sm:space-y-0 sm:space-x-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium text-white text-sm">{post.author.name}</span>
+                      <span className="text-gray-500 text-sm hidden sm:inline">@{post.author.username}</span>
+                      <span className="text-gray-500 text-sm hidden sm:inline">·</span>
+                      <span className="text-gray-500 text-sm hidden sm:inline">{formatDate(post.createdAt)}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 sm:hidden text-gray-500 text-sm">
+                      <span>@{post.author.username}</span>
+                      <span>·</span>
+                      <span>{formatDate(post.createdAt)}</span>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <button
-                      onClick={handleInteraction}
-                      className="p-1.5 rounded-full hover:bg-gray-800 transition-colors focus:outline-none focus:ring-0"
-                    >
-                      <MoreHorizontal className="h-4 w-4 text-gray-500" />
-                    </button>
+                    <div ref={moreMenuRef} className="relative">
+                      <button
+                        onClick={handleMoreClick}
+                        className="p-1.5 rounded-full hover:bg-gray-800 transition-colors focus:outline-none focus:ring-0"
+                      >
+                        <MoreHorizontal className="h-4 w-4 text-gray-500" />
+                      </button>
+                      
+                      {showMoreMenu && (
+                        <div className="absolute top-full right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2 z-10 min-w-[180px]">
+                          <div className="space-y-1">
+                            <button
+                              onClick={handleHidePost}
+                              className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                            >
+                              <EyeOff className="h-4 w-4 text-gray-400" />
+                              <span>Hide post</span>
+                            </button>
+                            
+                            <button
+                              onClick={handleReportPost}
+                              className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
+                            >
+                              <Flag className="h-4 w-4 text-orange-400" />
+                              <span>Report post</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -158,13 +411,11 @@ export const BlogPost = ({ post }: BlogPostProps) => {
                   {post.title}
                 </h2>
 
-                {/* Post Preview */}
                 <p className="text-gray-300 text-sm mb-3 leading-relaxed">
                   {getPreviewText(post.content)}
                   {post.content.length > 200 && '...'}
                 </p>
 
-                {/* Image Thumbnail */}
                 {post.image && (
                   <div className="mb-3 rounded-lg overflow-hidden">
                     <Image
@@ -181,15 +432,13 @@ export const BlogPost = ({ post }: BlogPostProps) => {
           </motion.article>
         </Link>
 
-        {/* Engagement Stats Card */}
         <motion.div
-          className="p-3 bg-gray-900/30 border border-gray-700 rounded-lg"
+          className="p-3  px-auto bg-gray-900/30 border border-gray-700 rounded-lg"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          {/* Engagement Stats */}
-          <div className="flex items-center justify-between max-w-md">
+          <div className="flex items-center justify-between max-w-md px-auto mx-auto">
             <button
               onClick={handleCommentClick}
               className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group focus:outline-none focus:ring-0"
@@ -222,14 +471,64 @@ export const BlogPost = ({ post }: BlogPostProps) => {
               <span className="text-sm">{likeCount}</span>
             </button>
 
-            <button
-              onClick={handleInteraction}
-              className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group focus:outline-none focus:ring-0"
-            >
-              <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
-                <Share className="h-4 w-4" />
-              </div>
-            </button>
+            <div ref={shareMenuRef} className="relative">
+              <button
+                onClick={handleShareClick}
+                className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group focus:outline-none focus:ring-0"
+              >
+                <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
+                  <Share className="h-4 w-4" />
+                </div>
+              </button>
+              
+              {showShareMenu && (
+                <div className="absolute bottom-full right-0 sm:left-0 sm:right-auto mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2 z-50 w-[200px] sm:min-w-[200px] sm:w-auto">
+                  <div className="space-y-1">
+                    <button
+                      onClick={shareToFacebook}
+                      className="w-full flex items-center space-x-3 px-3 py-3 sm:py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors touch-manipulation"
+                    >
+                      <Facebook className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                      <span>Share on Facebook</span>
+                    </button>
+                    
+                    <button
+                      onClick={shareToTwitter}
+                      className="w-full flex items-center space-x-3 px-3 py-3 sm:py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors touch-manipulation"
+                    >
+                      <Twitter className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                      <span>Share on X</span>
+                    </button>
+                    
+                    <button
+                      onClick={shareToLinkedIn}
+                      className="w-full flex items-center space-x-3 px-3 py-3 sm:py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors touch-manipulation"
+                    >
+                      <Linkedin className="h-4 w-4 text-blue-700 flex-shrink-0" />
+                      <span>Share on LinkedIn</span>
+                    </button>
+                    
+                    <button
+                      onClick={shareToTelegram}
+                      className="w-full flex items-center space-x-3 px-3 py-3 sm:py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors touch-manipulation"
+                    >
+                      <Telegram className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                      <span>Share on Telegram</span>
+                    </button>
+                    
+                    <div className="border-t border-gray-700 my-1"></div>
+                    
+                    <button
+                      onClick={copyLink}
+                      className="w-full flex items-center space-x-3 px-3 py-3 sm:py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors touch-manipulation"
+                    >
+                      <Copy className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      <span>Copy link</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <button
               onClick={handleBookmark}
@@ -243,10 +542,8 @@ export const BlogPost = ({ post }: BlogPostProps) => {
             </button>
           </div>
 
-          {/* Comments Section */}
           {showComments && (
             <div className="mt-4 border-t border-gray-800 pt-4" onClick={(e) => e.stopPropagation()}>
-              {/* Comment Form */}
               <form onSubmit={handleCommentSubmit} className="mb-4">
                 <div className="flex space-x-3">
                   <div className="flex-shrink-0">
@@ -274,8 +571,6 @@ export const BlogPost = ({ post }: BlogPostProps) => {
                   </div>
                 </div>
               </form>
-
-              {/* Comments List */}
               <div className="space-y-3">
                 {comments.map((comment) => (
                   <div key={comment.id} className="flex space-x-3">

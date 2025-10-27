@@ -39,6 +39,7 @@ export interface AboutData {
 
 export interface User {
   id: string
+  name: string
   username: string
   email: string
   avatar: string | null
@@ -76,7 +77,8 @@ export interface PostWithAuthor extends Post {
 export const mockUsers: User[] = [
   {
     id: '1',
-    username: 'Makara Roth',
+    name: 'Makara Roth',
+    username: 'roth',
     email: 'chhuonmakara@gmail.com',
     avatar: '/avatars/roth.jpg',
     createdAt: '2024-01-15T10:00:00Z',
@@ -84,7 +86,8 @@ export const mockUsers: User[] = [
   },
   {
     id: '2',
-    username: 'Jane Smith',
+    name: 'Jane Smith',
+    username: 'smith',
     email: 'jane.smith@example.com',
     avatar: '/avatars/jane.png',
     createdAt: '2024-01-10T08:30:00Z',
@@ -92,7 +95,8 @@ export const mockUsers: User[] = [
   },
   {
     id: '3',
-    username: 'Alex Chen',
+    name: 'Alex Chen',
+    username: 'chen',
     email: 'alex.chen@example.com',
     avatar: null,
     createdAt: '2024-01-05T14:20:00Z',
