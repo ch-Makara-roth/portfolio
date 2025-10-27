@@ -12,6 +12,11 @@ export default function AboutPage() {
   const [aboutData, setAboutData] = useState<AboutData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
     const fetchAboutData = async () => {
@@ -53,7 +58,7 @@ export default function AboutPage() {
         <div className="text-center">
           <p className="text-red-500 mb-4">Error: {error}</p>
           <button 
-            onClick={() => window.location.reload()} 
+            onClick={() => isClient && window.location.reload()} 
             className="px-4 py-2 bg-accent text-white rounded hover:bg-accent/80"
           >
             Retry
@@ -102,8 +107,8 @@ export default function AboutPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-accent/10 to-transparent rounded-2xl" />
             </div>
             
-            <div className="space-y-2 sm:space-y-3 md:space-y-4 text-center lg:text-left w-full">
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
+            <div className="space-y-2 sm:space-y-3 md:space-y-4 text-left lg:text-left w-full">
+              <div className="flex items-center justify-start lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
                 <MapPin size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
                 <span>{personalInfo.location}</span>
               </div>

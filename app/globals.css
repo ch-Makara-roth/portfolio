@@ -43,26 +43,50 @@ body {
     font-size: 14px;
     line-height: 1.5;
   }
-  
+
   /* Improve text readability on mobile */
-  .text-xs { font-size: 0.7rem; }
-  .text-sm { font-size: 0.8rem; }
-  .text-base { font-size: 0.9rem; }
-  .text-lg { font-size: 1rem; }
-  .text-xl { font-size: 1.1rem; }
-  .text-2xl { font-size: 1.3rem; }
-  .text-3xl { font-size: 1.5rem; }
+  .text-xs {
+    font-size: 0.7rem;
+  }
+
+  .text-sm {
+    font-size: 0.8rem;
+  }
+
+  .text-base {
+    font-size: 0.9rem;
+  }
+
+  .text-lg {
+    font-size: 1rem;
+  }
+
+  .text-xl {
+    font-size: 1.1rem;
+  }
+
+  .text-2xl {
+    font-size: 1.3rem;
+  }
+
+  .text-3xl {
+    font-size: 1.5rem;
+  }
 }
 
 /* Touch-friendly improvements */
 @media (hover: none) and (pointer: coarse) {
+
   /* Remove hover effects on touch devices */
   .hover\:scale-105:hover {
     transform: none;
   }
-  
+
   /* Improve touch targets */
-  button, a, input, textarea {
+  button,
+  a,
+  input,
+  textarea {
     min-height: 44px;
     min-width: 44px;
   }
@@ -127,12 +151,22 @@ img {
 }
 
 @keyframes loading {
-  0% { background-position: 100% 50%; }
-  100% { background-position: -100% 50%; }
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: -100% 50%;
+  }
 }
 
 /* Improve text rendering */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   text-rendering: optimizeLegibility;
 }
 
@@ -163,4 +197,95 @@ h1, h2, h3, h4, h5, h6 {
   :root {
     color-scheme: dark;
   }
-} 
+}
+
+/* Custom Scrollbar Styling - Grok-style */
+.custom-scrollbar {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 255, 218, 0.3) transparent;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(100, 255, 218, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 255, 218, 0.5);
+}
+
+/* Global scrollbar styling */
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 255, 218, 0.3) transparent;
+}
+
+body::-webkit-scrollbar {
+  width: 6px;
+}
+
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: rgba(100, 255, 218, 0.3);
+  border-radius: 3px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 255, 218, 0.5);
+}
+
+/* Hide scrollbar utility class */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Enhanced scroll behavior for horizontal containers */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Improved scroll snap for better UX */
+.scroll-snap-x {
+  scroll-snap-type: x mandatory;
+}
+
+.scroll-snap-start {
+  scroll-snap-align: start;
+}
+
+/* Custom scrollbar for containers that need visible scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(100, 255, 218, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 255, 218, 0.5);
+}
