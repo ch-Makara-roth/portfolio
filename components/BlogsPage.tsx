@@ -4,14 +4,24 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useCallback, useState, useMemo } from 'react'
 import { BlogPost as BlogPostComponent } from '@/components/BlogPost'
-import { PostWithAuthor } from '@/lib/mockData'
-import { Loader2, ServerCrash, Sparkles, TrendingUp } from 'lucide-react'
+import { blogApi, BlogPost } from '@/lib/blogApi'
+import { Loader2, ServerCrash, Sparkles } from 'lucide-react'
 
-export type { PostWithAuthor };
-
-async function fetchPosts({ pageParam = 1 }): Promise<{ posts: PostWithAuthor[], nextPage: number | null }> {
-  const response = await fetch(`/api/mock-posts?page=${pageParam}&limit=4`)
-  if (!response.ok) {
+async function fetchPosts({ pageParam = 1 }): Promise<{ posts: BlogPost[], nextPage: number | null }> {
+  try {
+    const result = await blogApi.getAllPosts({
+      page: pageParam,
+      limit: 4,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    })
+    
+    return {
+      posts: result.data,
+      nextPage: result.pagination.page < result.pagination.totalPages ? pageParam + 1 : null
+    }
+  } catch (error) {
+    console.error('Failed to fetch posts:', error)
     throw new Error('Failed to fetch posts')
   }
   const result = await response.json();
@@ -159,47 +169,18 @@ const BlogsPage = () => {
     <>
       {/* Main Content */}
       <div className="max-w-2xl mx-auto border-x max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 border-gray-800 min-h-screen">
-        {/* Enhanced Header with preserved structure */}
-        <div 
-          className="sticky top-0 z-[100] bg-black/80 backdrop-blur-md border-b border-gray-800 p-4 mb-4"
-          style={{
-            background: `rgba(0, 0, 0, ${headerBackgroundOpacity})`,
-          }}
-        >
-          <div className="flex items-center justify-between ">
-            <div className="flex items-center space-x-3">
-              <motion.div
-                animate={{ 
-                  rotate: [0, 360],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ 
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatDelay: 3
-                }}
-              >
-                <Sparkles className="h-5 w-5 text-blue-400" />
-              </motion.div>
-              <h1 className="text-xl font-bold">Latest Posts</h1>
-            </div>
-            
-            {totalPosts > 0 && (
-              <div className="flex items-center space-x-2 text-sm text-gray-400">
-                <TrendingUp className="h-4 w-4" />
-                <span>{totalPosts} posts</span>
-              </div>
-            )}
-          </div>
+        {/* Header */}
+        <div className="sticky top-0 bg-black/80 backdrop-blur-md border-b border-gray-800 p-4">
+          <h1 className="text-xl font-bold">Latest Posts</h1>
         </div>
-
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
           {data?.pages.map((page, pageIndex) =>
-            page.posts.map((post: PostWithAuthor, postIndex) => (
+            page.posts.map((post: BlogPost, postIndex) => (
+             
               <motion.div
                 key={post.id}
                 initial={{ opacity: 0, y: 20 }}

@@ -3,30 +3,64 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { PostWithAuthor } from '@/lib/mockData'
+import { BlogPost as BlogPostType } from '@/lib/blogApi'
 import { Heart, MessageCircle, Repeat2, Share, Bookmark, MoreHorizontal, Send, User, Facebook, Twitter, Linkedin, Send as Telegram, Copy, Link2, Edit, Trash2, Flag, Eye, EyeOff } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
-
-interface Comment {
-  id: string
-  author: string
-  content: string
-  createdAt: string
-  avatar?: string
-}
+import { blogApi, Comment } from '@/lib/blogApi'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 interface BlogPostProps {
-  post: PostWithAuthor
+  post: BlogPostType
 }
 
 export const BlogPost = ({ post }: BlogPostProps) => {
+  const queryClient = useQueryClient()
   const [isLiked, setIsLiked] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [likeCount, setLikeCount] = useState(post._count?.likes || 0)
   const [showComments, setShowComments] = useState(false)
-  const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
-  const [commentCount, setCommentCount] = useState(post._count?.comments || 0)
+  const [commentCount, setCommentCount] = useState(post._count?.comments ?? post.comments ?? 0)
+
+  // Use TanStack Query for comments with real-time updates
+  const {
+    data: commentsData,
+    isLoading: isLoadingComments,
+    refetch: refetchComments
+  } = useQuery({
+    queryKey: ['comments', post.id],
+    queryFn: () => blogApi.getComments(post.id, { page: 1, limit: 10 }),
+    enabled: showComments,
+    
+  })
+
+  const comments = commentsData?.data || []
+
+  // Mutation for creating comments
+  const createCommentMutation = useMutation({
+    mutationFn: (commentData: { author: string; content: string }) =>
+      blogApi.createComment(post.id, commentData),
+    onSuccess: (newCommentData) => {
+      // Update the comments cache with the new comment
+      queryClient.setQueryData(['comments', post.id], (oldData: any) => {
+        if (!oldData) return { data: [newCommentData] }
+        return {
+          ...oldData,
+          data: [newCommentData, ...oldData.data]
+        }
+      })
+      
+      // Invalidate and refetch to get the latest data from server
+      queryClient.invalidateQueries({ queryKey: ['comments', post.id] })
+      
+      // Update comment count
+      setCommentCount(prev => (prev || 0) + 1)
+      setNewComment('')
+    },
+    onError: (error) => {
+      console.error('Failed to create comment:', error)
+    }
+  })
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [isHidden, setIsHidden] = useState(() => {
@@ -149,22 +183,16 @@ export const BlogPost = ({ post }: BlogPostProps) => {
     setShowComments(!showComments)
   }
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
     
-    if (!newComment.trim()) return
+    if (!newComment.trim() || createCommentMutation.isPending) return
 
-    const comment: Comment = {
-      id: Date.now().toString(),
+    createCommentMutation.mutate({
       author: 'Anonymous User',
-      content: newComment.trim(),
-      createdAt: new Date().toISOString()
-    }
-
-    setComments(prev => [comment, ...prev])
-    setCommentCount(prev => prev + 1)
-    setNewComment('')
+      content: newComment.trim()
+    })
   }
 
   const handleInteraction = (e: React.MouseEvent) => {
@@ -312,7 +340,10 @@ export const BlogPost = ({ post }: BlogPostProps) => {
   }
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return 'Unknown'
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) return 'Invalid date'
+    
     const now = new Date()
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
     
@@ -323,7 +354,10 @@ export const BlogPost = ({ post }: BlogPostProps) => {
   }
 
   const formatCommentDate = (dateString: string) => {
+    if (!dateString) return 'Unknown'
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) return 'Invalid date'
+    
     const now = new Date()
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
     
@@ -349,8 +383,8 @@ export const BlogPost = ({ post }: BlogPostProps) => {
             <div className="flex space-x-3">
               <div className="flex-shrink-0">
                 <Image
-                  src={post.author.avatar || '/avatars/default.png'}
-                  alt={post.author.username}
+                  src={post.author?.avatar || '/avatars/default.png'}
+                  alt={post.author?.username || 'Anonymous'}
                   width={40}
                   height={40}
                   className="rounded-full"
@@ -446,7 +480,7 @@ export const BlogPost = ({ post }: BlogPostProps) => {
               <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
                 <MessageCircle className="h-4 w-4" />
               </div>
-              <span className="text-sm">{commentCount}</span>
+              <span className="text-sm">{commentCount || 0}</span>
             </button>
 
             <button
@@ -555,14 +589,15 @@ export const BlogPost = ({ post }: BlogPostProps) => {
                     <div className="relative">
                       <textarea
                         value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewComment(e.target.value)}
                         placeholder="Write a comment..."
                         className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 resize-none"
                         rows={2}
+                        disabled={createCommentMutation.isPending}
                       />
                       <button
                         type="submit"
-                        disabled={!newComment.trim()}
+                        disabled={!newComment.trim() || createCommentMutation.isPending}
                         className="absolute bottom-2 right-2 p-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors"
                       >
                         <Send className="h-3 w-3 text-white" />
@@ -571,6 +606,13 @@ export const BlogPost = ({ post }: BlogPostProps) => {
                   </div>
                 </div>
               </form>
+
+              {/* Loading State */}
+              {isLoadingComments && (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                </div>
+              )}
               <div className="space-y-3">
                 {comments.map((comment) => (
                   <div key={comment.id} className="flex space-x-3">

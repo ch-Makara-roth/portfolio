@@ -28,6 +28,9 @@ declare module '@testing-library/react' {
     getByText(text: string | RegExp): HTMLElement;
     getByRole(role: string, options?: any): HTMLElement;
     getByTestId(testId: string): HTMLElement;
+    getByPlaceholderText(text: string | RegExp): HTMLElement;
+    getByAltText(text: string | RegExp): HTMLElement;
+    getAllByText(text: string | RegExp): HTMLElement[];
     queryByText(text: string | RegExp): HTMLElement | null;
     queryByRole(role: string, options?: any): HTMLElement | null;
     findByText(text: string | RegExp): Promise<HTMLElement>;

@@ -9,9 +9,9 @@ const navItems = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/projects/', icon: FolderOpen, label: 'Projects' },
   { href: '/about/', icon: User, label: 'About' },
+  { href: '/blogs/', icon: Book, label: 'Blogs' },
   { href: '/services/', icon: Briefcase, label: 'Services' },
   { href: '/contact/', icon: Mail, label: 'Contact' },
-  { href: '/blogs/', icon: Book, label: 'Blogs' },
 ]
 
 export function DockNavigation() {

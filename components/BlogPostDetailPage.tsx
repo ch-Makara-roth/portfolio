@@ -1,24 +1,24 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { PostWithAuthor } from './BlogsPage'
+import { blogApi, BlogPost } from '@/lib/blogApi'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Calendar, Clock, Eye, Heart, MessageCircle, Share2, User, Facebook, Twitter, Linkedin, Send as Telegram, Copy } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from './ui/button'
-import { Badge } from './ui/badge'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { PostRecommendations } from './PostRecommendations'
 import { useState, useEffect, useRef } from 'react'
 
-async function fetchPost(slug: string): Promise<PostWithAuthor> {
-  const response = await fetch(`/api/v1/posts/${slug}`)
-  if (!response.ok) {
+async function fetchPost(slug: string): Promise<BlogPost> {
+  try {
+    const response = await blogApi.getPostBySlug(slug)
+    return response.data
+  } catch (error) {
+    console.error('Failed to fetch post:', error)
     throw new Error('Failed to fetch post')
   }
-  const result = await response.json();
-  return result.data;
 }
 
 const BlogPostDetailPage = ({ slug }: { slug: string }) => {
@@ -151,8 +151,18 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <h2 className="text-xl sm:text-2xl font-semibold text-text mb-4">Error loading post</h2>
-          <p className="text-dimmed text-sm sm:text-base">Please try again later</p>
+          <h2 className="text-xl sm:text-2xl font-semibold text-text mb-4">
+            {error instanceof Error ? 'Error loading post' : 'Post not found'}
+          </h2>
+          <p className="text-dimmed text-sm sm:text-base mb-4">
+            {error instanceof Error ? error.message : 'The requested post could not be found'}
+          </p>
+          <Link href="/blogs">
+            <Button variant="outline">
+              <ArrowLeft size={16} className="mr-2" />
+              Back to Blog
+            </Button>
+          </Link>
         </div>
       </div>
     )
@@ -192,22 +202,22 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-dimmed mb-6">
               <div className="flex items-center space-x-3">
                 <Image
-                  src={post.author.avatar || '/avatars/default.png'}
-                  alt={post.author.username}
+                  src={post.author?.avatar || '/avatars/default.png'}
+                  alt={post.author?.username || 'Anonymous'}
                   width={40}
                   height={40}
                   className="rounded-full object-cover"
                 />
                 <div className="text-left">
-                  <p className="font-semibold text-text">{post.author.username}</p>
-                  <p className="text-sm text-dimmed">Author</p>
+                  <p className="font-semibold text-text">{post.author?.firstName + ' ' + post.author?.lastName || 'Anonymous'}</p>
+                  <p className="text-sm text-dimmed">@{post.author?.username || 'anonymous'}</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <Calendar size={16} />
-                  <span>{new Date(post.createdAt).toLocaleDateString('en-US', { 
+                  <span>{new Date(post.createdAt || '').toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
                     day: 'numeric' 
@@ -215,7 +225,7 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock size={16} />
-                  <span>5 min read</span>
+                  <span>{post.readTime || '5 min'} read</span>
                 </div>
               </div>
             </div>
@@ -224,15 +234,15 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
             <div className="flex items-center justify-center gap-6 text-dimmed text-sm">
               <div className="flex items-center gap-1">
                 <Eye size={16} />
-                <span>1.2k views</span>
+                <span>{post.views || 0} views</span>
               </div>
               <div className="flex items-center gap-1">
                 <Heart size={16} />
-                <span>{post._count.likes} likes</span>
+                <span>{post._count?.likes || post.likes || 0} likes</span>
               </div>
               <div className="flex items-center gap-1">
                 <MessageCircle size={16} />
-                <span>{post._count.comments} comments</span>
+                <span>{post._count?.comments || post.comments || 0} comments</span> 
               </div>
             </div>
           </div>
@@ -313,7 +323,7 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
           className="mb-12"
         >
           <MarkdownRenderer 
-            content={post.content} 
+            content={post.content || ''} 
             className="prose-headings:scroll-mt-20"
           />
         </motion.article>
@@ -328,14 +338,14 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Image
-                src={post.author.avatar || '/avatars/default.png'}
-                alt={post.author.username}
+                src={post.author?.avatar || '/avatars/default.png'}
+                alt={post.author?.username || 'Anonymous'}
                 width={48}
                 height={48}
                 className="rounded-full object-cover"
               />
               <div>
-                <p className="font-semibold text-text">{post.author.username}</p>
+                <p className="font-semibold text-text">{post.author?.username || 'Anonymous'}</p>
                 <p className="text-sm text-dimmed">Software Developer & Writer</p>
               </div>
             </div>
@@ -343,11 +353,11 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm">
                 <Heart size={16} className="mr-2" />
-                Like ({post._count.likes})
+                Like ({post._count?.likes || post.likes || 0})
               </Button>
               <Button variant="outline" size="sm">
                 <MessageCircle size={16} className="mr-2" />
-                Comment ({post._count.comments})
+                Comment ({post._count?.comments || post.comments || 0})
               </Button>
               <div className="relative" ref={shareMenuRef}>
                 <Button 
