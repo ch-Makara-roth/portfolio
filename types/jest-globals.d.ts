@@ -23,15 +23,24 @@ declare module '@testing-library/react' {
     rerender: (ui: ReactElement) => void;
     unmount: () => void;
   };
-  
+
   export const screen: {
     getByText(text: string | RegExp): HTMLElement;
     getByRole(role: string, options?: any): HTMLElement;
     getByTestId(testId: string): HTMLElement;
+    getByPlaceholderText(text: string | RegExp): HTMLElement;
+    getByAltText(text: string | RegExp): HTMLElement;
+    getByLabelText(text: string | RegExp): HTMLElement;
+    getAllByText(text: string | RegExp): HTMLElement[];
+    getAllByRole(role: string, options?: any): HTMLElement[];
+    getAllByPlaceholderText(text: string | RegExp): HTMLElement[];
     queryByText(text: string | RegExp): HTMLElement | null;
     queryByRole(role: string, options?: any): HTMLElement | null;
+    queryByPlaceholderText(text: string | RegExp): HTMLElement | null;
+    queryByAltText(text: string | RegExp): HTMLElement | null;
     findByText(text: string | RegExp): Promise<HTMLElement>;
     findByRole(role: string, options?: any): Promise<HTMLElement>;
+    findByPlaceholderText(text: string | RegExp): Promise<HTMLElement>;
   };
 }
 
@@ -47,4 +56,4 @@ declare module '@testing-library/jest-dom' {
   }
 }
 
-export {};
+export { };

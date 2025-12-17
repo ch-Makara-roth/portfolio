@@ -1038,7 +1038,7 @@ export function getPaginatedPosts(page: number = 1, limit: number = 2) {
   const startIndex = (page - 1) * limit
   const endIndex = startIndex + limit
   const posts = mockPosts.slice(startIndex, endIndex)
-  
+
   return {
     data: posts,
     hasMore: endIndex < mockPosts.length,
@@ -1077,6 +1077,7 @@ export const mockAboutData: AboutData = {
     location: 'Khan Tuol Koak, Phnom Penh, Cambodia',
     phone: '(+855) 81693071',
     email: 'chhuonmakararoth@gmail.com',
+    birthDate: '2004-01-15',
     hobbies: ['Learning', 'Coding', 'Music', 'Reading'],
     profileImage: '/avatars/roth.jpg',
     story: [
