@@ -1052,6 +1052,23 @@ export function getPostBySlug(slug: string): PostWithAuthor | null {
   return mockPosts.find(post => post.slug === slug) || null
 }
 
+export function getPostById(id: string): PostWithAuthor | null {
+  return mockPosts.find(post => post.id === id) || null
+}
+
+export function updatePostLikes(id: string, delta: number): { id: string; likes: number } | null {
+  const post = getPostById(id)
+  if (!post) return null
+  const newLikes = Math.max(0, (post._count?.likes ?? post.likes ?? 0) + delta)
+  if (typeof post.likes === 'number') {
+    post.likes = newLikes
+  }
+  if (post._count && typeof post._count.likes === 'number') {
+    post._count.likes = newLikes
+  }
+  return { id, likes: newLikes }
+}
+
 // Mock about data
 export const mockAboutData: AboutData = {
   personalInfo: {
@@ -1060,7 +1077,6 @@ export const mockAboutData: AboutData = {
     location: 'Khan Tuol Koak, Phnom Penh, Cambodia',
     phone: '(+855) 81693071',
     email: 'chhuonmakararoth@gmail.com',
-    birthDate: 'January 17, 2004',
     hobbies: ['Learning', 'Coding', 'Music', 'Reading'],
     profileImage: '/avatars/roth.jpg',
     story: [
