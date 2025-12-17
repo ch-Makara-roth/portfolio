@@ -1,25 +1,25 @@
 import { useQuery } from '@tanstack/react-query'
-import { PostWithAuthor } from '@/lib/mockData'
+import { BlogPost } from '@/types/blog'
 
 interface RecommendationParams {
-  currentPost: PostWithAuthor
+  currentPost: BlogPost
   limit?: number
 }
 
 interface RecommendationResponse {
-  recommendations: PostWithAuthor[]
+  recommendations: BlogPost[]
   isLoading: boolean
   error: Error | null
 }
 
-async function fetchRecommendations(currentPost: PostWithAuthor, limit: number = 4): Promise<PostWithAuthor[]> {
-  const response = await fetch('/api/mock-posts?page=1&limit=20')
+async function fetchRecommendations(currentPost: BlogPost, limit: number = 4): Promise<BlogPost[]> {
+  const response = await fetch('https://api.chhuonmakararoth.site/api/v1/blog/?page=1&limit=20')
   if (!response.ok) {
     throw new Error('Failed to fetch posts for recommendations')
   }
   
   const result = await response.json()
-  const allPosts: PostWithAuthor[] = result.data
+  const allPosts: BlogPost[] = result.data
   
   const filteredPosts = allPosts.filter(post => post.id !== currentPost.id)
   
@@ -30,7 +30,7 @@ async function fetchRecommendations(currentPost: PostWithAuthor, limit: number =
     const postTags = post.tags || []
     
     const commonTags = currentTags.filter(tag => 
-      postTags.some(postTag => postTag.toLowerCase() === tag.toLowerCase())
+      postTags.some((postTag: string) => postTag.toLowerCase() === tag.toLowerCase())
     )
     score += commonTags.length * 3
     

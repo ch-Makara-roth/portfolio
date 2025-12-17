@@ -121,10 +121,6 @@ export default function AboutPage() {
                 <span>{personalInfo.email}</span>
               </div>
               <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
-                <Calendar size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span>Born: {personalInfo.birthDate}</span>
-              </div>
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
                 <Coffee size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
                 <span>Coffee Lover</span>
               </div>

@@ -3,20 +3,20 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { Calendar, Clock, ArrowRight, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react'
-import { PostWithAuthor } from '@/lib/mockData'
-import { usePostRecommendations } from '@/hooks/usePostRecommendations'
+import { BlogPost } from '@/types/blog'
+import { useRecommendedPosts } from '@/hooks/useBlogQueries'
 import { Badge } from './ui/badge'
 import { MobileContainer } from './ui/mobile-responsive'
 
 interface PostRecommendationsProps {
-  currentPost: PostWithAuthor
+  currentPost: BlogPost
   className?: string
 }
 
 interface RecommendationCardProps {
-  post: PostWithAuthor
+  post: BlogPost
   index: number
 }
 
@@ -60,7 +60,7 @@ const RecommendationCard = ({ post, index }: RecommendationCardProps) => {
               </div>
               <div className="flex items-center gap-1">
                 <Clock size={12} />
-                <span>{post.readTime} min read</span>
+                <span>{post.readingTime} min read</span>
               </div>
             </div>
             
@@ -92,7 +92,7 @@ const RecommendationCard = ({ post, index }: RecommendationCardProps) => {
             
             {post.tags && post.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 pt-2 flex-shrink-0">
-                {post.tags.slice(0, 2).map((tag, tagIndex) => (
+                {post.tags.slice(0, 2).map((tag: string, tagIndex: number) => (
                   <Badge
                     key={tagIndex}
                     variant="secondary"
@@ -181,7 +181,8 @@ const ErrorState = ({ onRetry }: { onRetry?: () => void }) => (
 )
 
 export const PostRecommendations = ({ currentPost, className = '' }: PostRecommendationsProps) => {
-  const { recommendations, isLoading, error } = usePostRecommendations({ currentPost, limit: 4 })
+  const { data: recommendationsData, isLoading, error, refetch } = useRecommendedPosts(currentPost.id, 4)
+  const recommendations = useMemo(() => recommendationsData?.data ?? [], [recommendationsData])
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
@@ -249,7 +250,7 @@ export const PostRecommendations = ({ currentPost, className = '' }: PostRecomme
             <Sparkles className="text-accent" size={20} />
             <h2 className="text-xl sm:text-2xl font-bold text-text">Related Articles</h2>
           </div>
-          <ErrorState />
+          <ErrorState onRetry={() => refetch()} />
         </section>
       </MobileContainer>
     )

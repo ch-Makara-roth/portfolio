@@ -155,7 +155,7 @@ describe('ProjectCard', () => {
     const { container } = render(<ProjectCard project={mockProject} viewMode="list" />)
     
     const cardElement = container.firstChild as HTMLElement
-    expect(cardElement).toHaveClass('flex-row')
+    expect(cardElement).toHaveClass('sm:flex-row')
   })
 
   it('handles mouse hover events', () => {
