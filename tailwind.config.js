@@ -4,6 +4,7 @@ module.exports = {
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
@@ -71,11 +72,11 @@ module.exports = {
           '100%': { transform: 'scale(1.5)' },
         },
         bounceGentle: {
-          '0%, 100%': { 
+          '0%, 100%': {
             transform: 'translateY(-5%)',
             'animation-timing-function': 'cubic-bezier(0.8, 0, 1, 1)'
           },
-          '50%': { 
+          '50%': {
             transform: 'translateY(0)',
             'animation-timing-function': 'cubic-bezier(0, 0, 0.2, 1)'
           },

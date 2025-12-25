@@ -3,62 +3,26 @@
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { 
-  Code, 
-  Smartphone, 
-  Palette, 
-  Database, 
-  Settings, 
-  Zap,
+import {
+  Code,
+  Smartphone,
+  Palette,
+  Database,
   Globe,
   Shield,
   ArrowRight
 } from 'lucide-react'
+import { mockServices } from '@/lib/mockData'
+import Link from 'next/link'
 
-const services = [
-  {
-    icon: Code,
-    title: 'Web Development',
-    description: 'Custom web applications built with modern technologies like React, Next.js, and TypeScript.',
-    features: ['Responsive Design', 'SEO Optimization', 'Performance Tuning', 'Modern UI/UX'],
-    color: 'from-accent to-accent/60'
-  },
-  {
-    icon: Smartphone,
-    title: 'Mobile Development',
-    description: 'Cross-platform mobile apps using React Native and Flutter for iOS and Android.',
-    features: ['Native Performance', 'Push Notifications', 'App Store Deployment', 'Offline Support'],
-    color: 'from-secondary to-secondary/60'
-  },
-  {
-    icon: Database,
-    title: 'API Development',
-    description: 'RESTful APIs and GraphQL services with robust authentication and real-time capabilities.',
-    features: ['RESTful APIs', 'GraphQL', 'Authentication', 'Real-time Updates'],
-    color: 'from-blue-500 to-blue-400'
-  },
-  {
-    icon: Palette,
-    title: 'UI/UX Design',
-    description: 'User-centered design solutions that prioritize usability and aesthetic appeal.',
-    features: ['User Research', 'Wireframing', 'Prototyping', 'Design Systems'],
-    color: 'from-purple-500 to-purple-400'
-  },
-  {
-    icon: Globe,
-    title: 'E-Commerce Solutions',
-    description: 'Complete e-commerce platforms with payment integration and inventory management.',
-    features: ['Payment Integration', 'Inventory Management', 'Order Tracking', 'Admin Dashboard'],
-    color: 'from-green-500 to-green-400'
-  },
-  {
-    icon: Shield,
-    title: 'Security & Performance',
-    description: 'Application security audits and performance optimization for better user experience.',
-    features: ['Security Audits', 'Performance Optimization', 'Load Testing', 'Monitoring'],
-    color: 'from-red-500 to-red-400'
-  }
-]
+const iconMap: Record<string, any> = {
+  Code,
+  Smartphone,
+  Palette,
+  Database,
+  Globe,
+  Shield
+}
 
 const process = [
   {
@@ -108,46 +72,48 @@ export default function ServicesPage() {
           className="mb-12 sm:mb-16 md:mb-20"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {services.map((service, index) => {
-              const Icon = service.icon
+            {mockServices.map((service, index) => {
+              const Icon = iconMap[service.icon] || Code
               return (
                 <motion.div
-                  key={service.title}
+                  key={service.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + index * 0.1, duration: 0.8 }}
                   whileHover={{ y: -5 }}
                   className="group"
                 >
-                  <Card className="bg-bg/50 border-dimmed/20 backdrop-blur-sm h-full p-4 sm:p-5 md:p-6 hover:border-accent/40 transition-all duration-300">
+                  <Card className="bg-bg/50 border-dimmed/20 backdrop-blur-sm h-full p-4 sm:p-5 md:p-6 hover:border-accent/40 transition-all duration-300 flex flex-col">
                     <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-4 sm:mb-5 md:mb-6 group-hover:scale-110 transition-transform duration-300`}>
                       <Icon size={24} className="sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
                     </div>
-                    
+
                     <h3 className="text-lg sm:text-xl font-semibold text-text mb-2 sm:mb-3 group-hover:text-accent transition-colors leading-tight">
                       {service.title}
                     </h3>
-                    
-                    <p className="text-dimmed text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
+
+                    <p className="text-dimmed text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed line-clamp-3">
                       {service.description}
                     </p>
-                    
-                    <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5 md:mb-6">
-                      {service.features.map((feature) => (
+
+                    <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5 md:mb-6 flex-grow">
+                      {service.features.slice(0, 4).map((feature) => (
                         <li key={feature} className="flex items-center gap-2 text-xs sm:text-sm text-text/80">
                           <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-accent rounded-full flex-shrink-0" />
                           {feature}
                         </li>
                       ))}
                     </ul>
-                    
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-accent/40 text-accent hover:bg-accent/10 group-hover:border-accent transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 md:py-3 min-h-[36px] sm:min-h-[40px]"
-                    >
-                      <span className="mr-2">Learn More</span>
-                      <ArrowRight size={14} className="sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+
+                    <Link href={`/services/${service.slug}`} className="block mt-auto">
+                      <Button
+                        variant="outline"
+                        className="w-full border-accent/40 text-accent hover:bg-accent/10 group-hover:border-accent transition-all duration-300 text-xs sm:text-sm py-2 sm:py-2.5 md:py-3 min-h-[36px] sm:min-h-[40px]"
+                      >
+                        <span className="mr-2">Learn More</span>
+                        <ArrowRight size={14} className="sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
                   </Card>
                 </motion.div>
               )
@@ -194,10 +160,10 @@ export default function ServicesPage() {
         >
           <h2 className="text-xl sm:text-2xl font-semibold text-text mb-3 sm:mb-4">Ready to Start Your Project?</h2>
           <p className="text-dimmed mb-4 sm:mb-6 max-w-2xl mx-auto text-xs sm:text-sm px-2">
-            Let's discuss your ideas and create something amazing together. 
+            Let's discuss your ideas and create something amazing together.
             I'm here to help you build the perfect solution for your needs.
           </p>
-          <Button 
+          <Button
             className="bg-accent hover:bg-accent/80 text-bg font-semibold px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base min-h-[44px] sm:min-h-[48px]"
             size="lg"
           >
@@ -208,4 +174,4 @@ export default function ServicesPage() {
       </div>
     </div>
   )
-} 
+}
