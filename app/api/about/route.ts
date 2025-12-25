@@ -3,8 +3,8 @@ import { getAboutData } from '@/lib/mockData'
 
 export async function GET() {
   try {
-    const aboutData = getAboutData()
-    
+    const aboutData = await getAboutData()
+
     return NextResponse.json({
       success: true,
       data: aboutData
@@ -12,9 +12,9 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching about data:', error)
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch about data' 
+      {
+        success: false,
+        error: 'Failed to fetch about data'
       },
       { status: 500 }
     )

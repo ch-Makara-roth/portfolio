@@ -21,7 +21,7 @@ export async function POST(
     )
   }
 
-  const result = updatePostLikes(id, 1)
+  const result = updatePostLikes(id, true)
   return NextResponse.json({ success: true, data: result, message: 'Blog post liked successfully' })
 }
 
@@ -45,6 +45,6 @@ export async function DELETE(
     )
   }
 
-  const result = updatePostLikes(id, -1)
+  const result = updatePostLikes(id, false)
   return NextResponse.json({ success: true, data: result, message: 'Blog post unliked successfully' })
 }

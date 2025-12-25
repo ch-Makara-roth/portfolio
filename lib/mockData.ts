@@ -1,5 +1,29 @@
 // Mock data for the frontend-only application
 
+// Service interfaces
+export interface ServiceProcess {
+  step: string
+  title: string
+  description: string
+}
+
+export interface ServiceWorkflow {
+  title: string
+  description: string
+}
+
+export interface Service {
+  id: string
+  slug: string
+  icon: string // String identifier for the icon component
+  title: string
+  description: string
+  features: string[]
+  color: string
+  workflow: ServiceWorkflow[]
+  process: ServiceProcess[]
+}
+
 // About page interfaces
 export interface PersonalInfo {
   name: string
@@ -72,6 +96,280 @@ export interface PostWithAuthor extends Post {
     comments: number
   }
 }
+
+// Mock Services Data
+export const mockServices: Service[] = [
+  {
+    id: '1',
+    slug: 'web-development',
+    icon: 'Code',
+    title: 'Web Development',
+    description: 'Custom web applications built with modern technologies like React, Next.js, and TypeScript.',
+    color: 'from-blue-600 to-cyan-500',
+    features: ['Responsive Design', 'SEO Optimization', 'Performance Tuning', 'Modern UI/UX'],
+    workflow: [
+      {
+        title: 'Requirement Analysis',
+        description: 'We start by gathering all the necessary requirements and understanding your business goals.'
+      },
+      {
+        title: 'Tech Stack Selection',
+        description: 'Choosing the right technologies that fit your project needs and scalability requirements.'
+      },
+      {
+        title: 'Architecture Design',
+        description: 'Designing a robust and scalable architecture for your web application.'
+      }
+    ],
+    process: [
+      {
+        step: '01',
+        title: 'Discovery',
+        description: 'Understanding your requirements and project goals through detailed consultation.'
+      },
+      {
+        step: '02',
+        title: 'Design',
+        description: 'Creating wireframes and UI/UX designs to visualize the end product.'
+      },
+      {
+        step: '03',
+        title: 'Development',
+        description: 'Coding the application with clean, maintainable, and efficient code.'
+      },
+      {
+        step: '04',
+        title: 'Testing & Launch',
+        description: 'Rigorous testing to ensure bug-free deployment and successful launch.'
+      }
+    ]
+  },
+  {
+    id: '2',
+    slug: 'mobile-development',
+    icon: 'Smartphone',
+    title: 'Mobile Development',
+    description: 'Cross-platform mobile apps using React Native and Flutter for iOS and Android.',
+    color: 'from-secondary to-secondary/60',
+    features: ['Native Performance', 'Push Notifications', 'App Store Deployment', 'Offline Support'],
+    workflow: [
+      {
+        title: 'Prototyping',
+        description: 'Creating interactive prototypes to validate app flow and user experience.'
+      },
+      {
+        title: 'Cross-Platform Dev',
+        description: 'Developing for both iOS and Android using a single codebase for efficiency.'
+      },
+      {
+        title: 'Native Integration',
+        description: 'Integrating with native device features like camera, GPS, and sensors.'
+      }
+    ],
+    process: [
+      {
+        step: '01',
+        title: 'Concept',
+        description: 'Refining your app idea and defining core features.'
+      },
+      {
+        step: '02',
+        title: 'UI/UX',
+        description: 'Designing intuitive interfaces for mobile screens.'
+      },
+      {
+        step: '03',
+        title: 'Build',
+        description: 'Developing the app using React Native or Flutter.'
+      },
+      {
+        step: '04',
+        title: 'Release',
+        description: 'Publishing your app to the Apple App Store and Google Play Store.'
+      }
+    ]
+  },
+  {
+    id: '3',
+    slug: 'api-development',
+    icon: 'Database',
+    title: 'API Development',
+    description: 'RESTful APIs and GraphQL services with robust authentication and real-time capabilities.',
+    color: 'from-blue-500 to-blue-400',
+    features: ['RESTful APIs', 'GraphQL', 'Authentication', 'Real-time Updates'],
+    workflow: [
+      {
+        title: 'Schema Design',
+        description: 'Defining data models and API contracts (Swagger/OpenAPI or GraphQL Schema).'
+      },
+      {
+        title: 'Security Implementation',
+        description: 'Implementing OAuth, JWT, and rate limiting to secure your endpoints.'
+      },
+      {
+        title: 'Optimization',
+        description: 'Caching, database indexing, and query optimization for high performance.'
+      }
+    ],
+    process: [
+      {
+        step: '01',
+        title: 'Planning',
+        description: 'Defining endpoints, data structures, and access patterns.'
+      },
+      {
+        step: '02',
+        title: 'Development',
+        description: 'Building the API logic, connecting to databases and external services.'
+      },
+      {
+        step: '03',
+        title: 'Documentation',
+        description: 'Creating comprehensive API documentation for developers.'
+      },
+      {
+        step: '04',
+        title: 'Deployment',
+        description: 'Deploying to cloud infrastructure with auto-scaling capabilities.'
+      }
+    ]
+  },
+  {
+    id: '4',
+    slug: 'ui-ux-design',
+    icon: 'Palette',
+    title: 'UI/UX Design',
+    description: 'User-centered design solutions that prioritize usability and aesthetic appeal.',
+    color: 'from-purple-500 to-purple-400',
+    features: ['User Research', 'Wireframing', 'Prototyping', 'Design Systems'],
+    workflow: [
+      {
+        title: 'User Research',
+        description: 'Analyzing target audience, competitors, and user needs.'
+      },
+      {
+        title: 'Information Architecture',
+        description: 'Structuring content and flow for intuitive navigation.'
+      },
+      {
+        title: 'Visual Design',
+        description: 'Crafting the look and feel with typography, color, and imagery.'
+      }
+    ],
+    process: [
+      {
+        step: '01',
+        title: 'Research',
+        description: 'Gathering insights to inform design decisions.'
+      },
+      {
+        step: '02',
+        title: 'Wireframes',
+        description: 'Creating low-fidelity layout sketches.'
+      },
+      {
+        step: '03',
+        title: 'Prototype',
+        description: 'Building interactive high-fidelity mockups.'
+      },
+      {
+        step: '04',
+        title: 'Handoff',
+        description: 'Preparing assets and style guides for developers.'
+      }
+    ]
+  },
+  {
+    id: '5',
+    slug: 'ecommerce-solutions',
+    icon: 'Globe',
+    title: 'E-Commerce Solutions',
+    description: 'Complete e-commerce platforms with payment integration and inventory management.',
+    color: 'from-green-500 to-green-400',
+    features: ['Payment Integration', 'Inventory Management', 'Order Tracking', 'Admin Dashboard'],
+    workflow: [
+      {
+        title: 'Platform Setup',
+        description: 'Setting up the storefront, cart, and checkout flows.'
+      },
+      {
+        title: 'Payment Gateway',
+        description: 'Secure integration with Stripe, PayPal, or other providers.'
+      },
+      {
+        title: 'Product Management',
+        description: 'Tools for easy inventory updates and order processing.'
+      }
+    ],
+    process: [
+      {
+        step: '01',
+        title: 'Strategy',
+        description: 'Defining product catalog and sales channels.'
+      },
+      {
+        step: '02',
+        title: 'Setup',
+        description: 'Configuring the e-commerce engine and database.'
+      },
+      {
+        step: '03',
+        title: 'Integration',
+        description: 'Connecting payments, shipping, and email services.'
+      },
+      {
+        step: '04',
+        title: 'Launch',
+        description: 'Going live and monitoring sales performance.'
+      }
+    ]
+  },
+  {
+    id: '6',
+    slug: 'security-performance',
+    icon: 'Shield',
+    title: 'Security & Performance',
+    description: 'Application security audits and performance optimization for better user experience.',
+    color: 'from-red-500 to-red-400',
+    features: ['Security Audits', 'Performance Optimization', 'Load Testing', 'Monitoring'],
+    workflow: [
+      {
+        title: 'Audit & Analysis',
+        description: 'Scanning for vulnerabilities and performance bottlenecks.'
+      },
+      {
+        title: 'Remediation',
+        description: 'Fixing values, patching security holes, and optimizing code.'
+      },
+      {
+        title: 'Continuous Monitoring',
+        description: 'Setting up alerts and dashboards for real-time health checks.'
+      }
+    ],
+    process: [
+      {
+        step: '01',
+        title: 'Audit',
+        description: 'Comprehensive assessment of current system state.'
+      },
+      {
+        step: '02',
+        title: 'Plan',
+        description: 'Prioritizing fixes and optimization tasks.'
+      },
+      {
+        step: '03',
+        title: 'Execute',
+        description: 'Applying updates, code fixes, and configuration changes.'
+      },
+      {
+        step: '04',
+        title: 'Verify',
+        description: 'Retesting to confirm improvements and security.'
+      }
+    ]
+  }
+]
 
 // Mock users
 export const mockUsers: User[] = [
@@ -146,7 +444,7 @@ my-app/
 │   └── globals.css
 ├── components/
 ├── lib/
-└── public/
+│   └── public/
 \`\`\`
 
 ### Server vs Client Components
@@ -751,7 +1049,7 @@ if (window.PublicKeyCredential) {
         id: new TextEncoder().encode(userId),
         name: userEmail,
         displayName: userName
-      },
+       },
       pubKeyCredParams: [{ alg: -7, type: "public-key" }]
     }
   })
@@ -798,234 +1096,37 @@ Designing databases that scale with your application is both an art and a scienc
 
 ### 1. Normalization vs Denormalization
 
-#### Normalization (OLTP Systems)
-Reduces data redundancy and improves data integrity:
-
-\`\`\`sql
--- Normalized structure
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  name VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE posts (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  content TEXT,
-  user_id INTEGER REFERENCES users(id),
-  created_at TIMESTAMP DEFAULT NOW()
-);
-\`\`\`
-
-#### Denormalization (OLAP Systems)
-Optimizes for read performance:
-
-\`\`\`sql
--- Denormalized for analytics
-CREATE TABLE post_analytics (
-  id SERIAL PRIMARY KEY,
-  post_id INTEGER,
-  post_title VARCHAR(255),
-  author_name VARCHAR(255),
-  author_email VARCHAR(255),
-  views INTEGER DEFAULT 0,
-  likes INTEGER DEFAULT 0,
-  created_at TIMESTAMP
-);
-\`\`\`
+- **Normalization**: Reducing data redundancy and improving integrity.
+- **Denormalization**: Optimizing for read performance by adding redundant data.
 
 ### 2. Indexing Strategies
 
-#### Primary Indexes
+Indexes are critical for query performance.
+
 \`\`\`sql
--- Composite index for common queries
-CREATE INDEX idx_posts_user_date ON posts(user_id, created_at DESC);
-
--- Partial index for active users
-CREATE INDEX idx_active_users ON users(id) WHERE active = true;
+-- Creating an index on frequently queried columns
+CREATE INDEX idx_users_email ON users(email);
 \`\`\`
 
-#### Full-Text Search
-\`\`\`sql
--- PostgreSQL full-text search
-CREATE INDEX idx_posts_search ON posts 
-USING gin(to_tsvector('english', title || ' ' || content));
+### 3. Sharding and Partitioning
 
--- Query with full-text search
-SELECT * FROM posts 
-WHERE to_tsvector('english', title || ' ' || content) 
-@@ plainto_tsquery('english', 'database design');
-\`\`\`
+Splitting data across multiple machines or tables to improve scalability.
 
-## Scaling Strategies
+## Practical Strategies
 
-### 1. Vertical Scaling (Scale Up)
-- Increase CPU, RAM, or storage
-- Simpler to implement
-- Limited by hardware constraints
+1. **Use optimal data types**
+2. **Handle concurrency correctly** (Transactions, Locks)
+3. **Plan for growth** (Capacity planning)
+4. **Regular backups and disaster recovery**
 
-### 2. Horizontal Scaling (Scale Out)
+## Conclusion
 
-#### Read Replicas
-\`\`\`javascript
-// Database connection with read replicas
-const dbConfig = {
-  master: {
-    host: 'master-db.example.com',
-    port: 5432,
-    // write operations
-  },
-  slaves: [
-    { host: 'replica1.example.com', port: 5432 },
-    { host: 'replica2.example.com', port: 5432 }
-  ]
-}
-\`\`\`
-
-#### Sharding
-\`\`\`javascript
-// Horizontal partitioning by user ID
-function getShardKey(userId) {
-  return userId % 4 // 4 shards
-}
-
-function getDatabase(userId) {
-  const shard = getShardKey(userId)
-  return \`shard_\${shard}\`
-}
-\`\`\`
-
-### 3. Caching Layers
-
-#### Redis for Session Storage
-\`\`\`javascript
-const redis = require('redis')
-const client = redis.createClient()
-
-// Cache user session
-await client.setex(\`session:\${sessionId}\`, 3600, JSON.stringify(userData))
-
-// Retrieve session
-const session = await client.get(\`session:\${sessionId}\`)
-\`\`\`
-
-#### Application-Level Caching
-\`\`\`javascript
-// Cache frequently accessed data
-const cache = new Map()
-
-async function getUser(id) {
-  const cacheKey = \`user:\${id}\`
-  
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey)
-  }
-  
-  const user = await db.query('SELECT * FROM users WHERE id = $1', [id])
-  cache.set(cacheKey, user, { ttl: 300 }) // 5 minutes
-  
-  return user
-}
-\`\`\`
-
-## NoSQL Considerations
-
-### When to Choose NoSQL
-
-| Use Case | SQL | NoSQL |
-|----------|-----|-------|
-| Complex relationships | ✅ | ❌ |
-| ACID transactions | ✅ | ⚠️ |
-| Flexible schema | ❌ | ✅ |
-| Horizontal scaling | ⚠️ | ✅ |
-| Rapid development | ❌ | ✅ |
-
-### MongoDB Example
-\`\`\`javascript
-// Document-based design
-const userSchema = {
-  _id: ObjectId,
-  email: String,
-  profile: {
-    name: String,
-    avatar: String,
-    preferences: {
-      theme: String,
-      notifications: Boolean
-    }
-  },
-  posts: [
-    {
-      title: String,
-      content: String,
-      tags: [String],
-      createdAt: Date
-    }
-  ]
-}
-\`\`\`
-
-## Performance Optimization
-
-### 1. Query Optimization
-\`\`\`sql
--- Use EXPLAIN to analyze queries
-EXPLAIN ANALYZE 
-SELECT u.name, COUNT(p.id) as post_count
-FROM users u
-LEFT JOIN posts p ON u.id = p.user_id
-WHERE u.active = true
-GROUP BY u.id, u.name
-ORDER BY post_count DESC
-LIMIT 10;
-\`\`\`
-
-### 2. Connection Pooling
-\`\`\`javascript
-// PostgreSQL connection pool
-const { Pool } = require('pg')
-
-const pool = new Pool({
-  host: 'localhost',
-  port: 5432,
-  database: 'myapp',
-  user: 'postgres',
-  password: 'password',
-  max: 20, // Maximum connections
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-})
-\`\`\`
-
-### 3. Database Monitoring
-\`\`\`sql
--- Monitor slow queries
-SELECT query, mean_time, calls, total_time
-FROM pg_stat_statements
-ORDER BY mean_time DESC
-LIMIT 10;
-\`\`\`
-
-## Best Practices Checklist
-
-- [ ] **Design for your access patterns**
-- [ ] **Use appropriate data types**
-- [ ] **Implement proper indexing**
-- [ ] **Plan for data growth**
-- [ ] **Monitor query performance**
-- [ ] **Implement backup strategies**
-- [ ] **Use connection pooling**
-- [ ] **Consider caching layers**
-- [ ] **Plan for disaster recovery**
-- [ ] **Regular maintenance and optimization**
-
-> **Remember**: Premature optimization is the root of all evil, but planning for scale from the beginning saves headaches later! 📈`,
+A well-designed database is the foundation of a scalable application. Invest time in the design phase to save headaches later!`,
     slug: 'database-design-scalable-applications',
     createdAt: '2024-01-10T10:30:00Z',
     updatedAt: '2024-01-10T10:30:00Z',
-    authorId: '2',
-    author: mockUsers[1],
+    authorId: '1',
+    author: mockUsers[0],
     _count: {
       likes: 29,
       comments: 7
@@ -1033,43 +1134,7 @@ LIMIT 10;
   }
 ]
 
-// Helper functions for pagination
-export function getPaginatedPosts(page: number = 1, limit: number = 2) {
-  const startIndex = (page - 1) * limit
-  const endIndex = startIndex + limit
-  const posts = mockPosts.slice(startIndex, endIndex)
-
-  return {
-    data: posts,
-    hasMore: endIndex < mockPosts.length,
-    total: mockPosts.length,
-    page,
-    limit
-  }
-}
-
-export function getPostBySlug(slug: string): PostWithAuthor | null {
-  return mockPosts.find(post => post.slug === slug) || null
-}
-
-export function getPostById(id: string): PostWithAuthor | null {
-  return mockPosts.find(post => post.id === id) || null
-}
-
-export function updatePostLikes(id: string, delta: number): { id: string; likes: number } | null {
-  const post = getPostById(id)
-  if (!post) return null
-  const newLikes = Math.max(0, (post._count?.likes ?? post.likes ?? 0) + delta)
-  if (typeof post.likes === 'number') {
-    post.likes = newLikes
-  }
-  if (post._count && typeof post._count.likes === 'number') {
-    post._count.likes = newLikes
-  }
-  return { id, likes: newLikes }
-}
-
-// Mock about data
+// Mock About Data
 export const mockAboutData: AboutData = {
   personalInfo: {
     name: 'Chhuon Makara Roth',
@@ -1077,7 +1142,6 @@ export const mockAboutData: AboutData = {
     location: 'Khan Tuol Koak, Phnom Penh, Cambodia',
     phone: '(+855) 81693071',
     email: 'chhuonmakararoth@gmail.com',
-    birthDate: '2004-01-15',
     hobbies: ['Learning', 'Coding', 'Music', 'Reading'],
     profileImage: '/avatars/roth.jpg',
     story: [
@@ -1088,11 +1152,9 @@ export const mockAboutData: AboutData = {
     ]
   },
   skills: [
-    'React', 'Redux', 'Redux Toolkit', 'Next.js', 'TypeScript', 'JavaScript', 'HTML', 'CSS', 'SCSS',
-    'Tailwind CSS', 'Bootstrap', 'Node.js', 'Express.js', 'MongoDB', 'MySQL', 'PostgreSQL',
-    'Git', 'GitHub', 'GitLab', 'Figma', 'Adobe XD', 'Photoshop', 'REST APIs', 'GraphQL',
-    'Responsive Design', 'Cross-browser Compatibility', 'Performance Optimization', 'SEO',
-    'Agile/Scrum', 'Team Collaboration', 'Problem Solving', 'Project Management'
+    'JavaScript', 'TypeScript', 'React', 'Next.js', 'Node.js',
+    'HTML5', 'CSS3', 'Tailwind CSS', 'PostgreSQL', 'MongoDB',
+    'Git', 'Docker', 'AWS'
   ],
   experiences: [
     {
@@ -1144,7 +1206,7 @@ export const mockAboutData: AboutData = {
     },
     {
       degree: 'High School Diploma (Baccii Grade 12)',
-      school: 'Sisowath High School',
+      school: 'Somlout High School',
       period: '2018 - 2022',
       location: 'Phnom Penh, Cambodia',
       description: 'Completed secondary education with focus on science and mathematics'
@@ -1157,18 +1219,73 @@ export function getAboutData(): AboutData {
   return mockAboutData
 }
 
-// Mock contact form submission
-export function submitContactForm(data: {
-  name: string
-  email: string
-  subject: string
-  message: string
-}) {
-  // Simulate API delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('Contact form submitted:', data)
-      resolve({ success: true, message: 'Message sent successfully!' })
-    }, 1000)
-  })
+export async function submitContactForm(data: any): Promise<{ success: boolean; message: string }> {
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  // Simulate simple validation
+  if (!data.email || !data.message) {
+    throw new Error('Email and message are required')
+  }
+  return { success: true, message: 'Message sent successfully!' }
+}
+
+export async function getPaginatedPosts(page: number = 1, limit: number = 10, tag?: string) {
+  await new Promise(resolve => setTimeout(resolve, 500))
+
+  let filteredPosts = [...mockPosts]
+
+  if (tag) {
+    filteredPosts = filteredPosts.filter(post => post.tags.includes(tag))
+  }
+
+  // Sort by date desc
+  filteredPosts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+
+  const total = filteredPosts.length
+  const totalPages = Math.ceil(total / limit)
+  const offset = (page - 1) * limit
+  const posts = filteredPosts.slice(offset, offset + limit)
+
+  return {
+    posts,
+    metadata: {
+      total,
+      totalPages,
+      currentPage: page,
+      limit
+    }
+  }
+}
+
+export async function getPostById(id: string): Promise<PostWithAuthor | undefined> {
+  await new Promise(resolve => setTimeout(resolve, 300))
+  return mockPosts.find(post => post.id === id)
+}
+
+export async function getPostBySlug(slug: string): Promise<PostWithAuthor | undefined> {
+  await new Promise(resolve => setTimeout(resolve, 300))
+  return mockPosts.find(post => post.slug === slug)
+}
+
+export async function updatePostLikes(id: string, increment: boolean): Promise<PostWithAuthor | null> {
+  await new Promise(resolve => setTimeout(resolve, 300))
+  const postIndex = mockPosts.findIndex(p => p.id === id)
+
+  if (postIndex === -1) return null
+
+  const post = mockPosts[postIndex]
+  const newLikes = increment ? post.likes + 1 : Math.max(0, post.likes - 1)
+
+  const updatedPost = {
+    ...post,
+    likes: newLikes,
+    _count: {
+      ...post._count,
+      likes: newLikes
+    }
+  }
+
+  // Update the mock data in memory (since it's a mock)
+  mockPosts[postIndex] = updatedPost
+
+  return updatedPost
 }
