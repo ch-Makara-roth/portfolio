@@ -31,7 +31,7 @@ export interface PersonalInfo {
   location: string
   phone: string
   email: string
-  birthDate: string
+
   hobbies: string[]
   profileImage: string
   story: string[]
@@ -1142,6 +1142,7 @@ export const mockAboutData: AboutData = {
     location: 'Khan Tuol Koak, Phnom Penh, Cambodia',
     phone: '(+855) 81693071',
     email: 'chhuonmakararoth@gmail.com',
+
     hobbies: ['Learning', 'Coding', 'Music', 'Reading'],
     profileImage: '/avatars/roth.jpg',
     story: [
