@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ExternalLink, Github, Star, Eye, Calendar } from 'lucide-react'
+import { ExternalLink, Github, Star, Eye, Calendar, ArrowLeft } from 'lucide-react'
 import { Project } from '@/app/api/projects/route'
 import Image from 'next/image'
 import { useState } from 'react'
@@ -13,13 +13,17 @@ import { useRouter } from 'next/navigation'
 interface ProjectCardProps {
   project: Project
   viewMode?: 'grid' | 'list'
+  className?: string
+  isLarge?: boolean
 }
 
-export function ProjectCard({ project, viewMode = 'grid' }: ProjectCardProps) {
+export function ProjectCard({ project, viewMode = 'grid', className = '', isLarge = false }: ProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const router = useRouter()
 
-  const handleNavigateToProject = () => {
+  const handleNavigateToProject = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on link buttons
+    if ((e.target as HTMLElement).closest('a')) return
     router.push(`/projects/${project.id}`)
   }
 
@@ -30,139 +34,111 @@ export function ProjectCard({ project, viewMode = 'grid' }: ProjectCardProps) {
       transition={{ duration: 0.5 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`group relative bg-gradient-to-br from-bg/80 via-bg/60 to-bg/40 backdrop-blur-xl border border-dimmed/20 rounded-2xl overflow-hidden hover:border-accent/30 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/10 ${
-        viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''
-      }`}
+      onClick={handleNavigateToProject}
+      className={`group relative bg-bg/20 backdrop-blur-3xl border border-dimmed/10 rounded-[2.5rem] overflow-hidden hover:border-accent/40 transition-all duration-700 hover:shadow-[0_0_50px_rgba(100,255,218,0.1)] cursor-pointer ${viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''
+        } ${className}`}
     >
-      {/* Glow Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      {/* Featured Badge */}
-      {project.featured && (
-        <div className="absolute top-4 left-4 z-10">
-          <Badge className="bg-accent/20 text-accent border-accent/30 backdrop-blur-sm">
-            <Star size={12} className="mr-1" />
-            Featured
-          </Badge>
-        </div>
-      )}
+      {/* Dynamic Background Glow */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"
+      />
 
       {/* Image Container */}
-      <div 
-        className={`relative overflow-hidden cursor-pointer group/image ${
-          viewMode === 'list' 
-            ? 'w-full h-48 sm:w-80 sm:h-48 flex-shrink-0 sm:rounded-l-2xl rounded-t-2xl sm:rounded-t-none' 
-            : 'h-48 sm:h-56'
-        }`}
-        onClick={handleNavigateToProject}
+      <div
+        className={`relative overflow-hidden ${viewMode === 'list'
+          ? 'w-full h-48 sm:w-[22rem] sm:h-auto flex-shrink-0'
+          : isLarge ? 'h-80 sm:h-96 lg:h-[28rem]' : 'h-48 sm:h-56 lg:h-64'
+          }`}
       >
         <Image
           src={project.image}
           alt={project.title}
           fill
-          className={`transition-transform duration-700 group-hover/image:scale-110 ${
-            viewMode === 'list' ? 'object-cover object-center' : 'object-cover'
-          }`}
+          className={`transition-transform duration-[1.5s] ease-[cubic-bezier(0.2,0,0,1)] group-hover:scale-110 object-cover object-top`}
+          priority={isLarge}
         />
-        
-        {/* Multi-layer Gradient Overlays */}
-        <div className={`absolute inset-0 ${
-          viewMode === 'list' 
-            ? 'bg-gradient-to-b sm:bg-gradient-to-r from-transparent via-bg/10 to-bg/30' 
-            : 'bg-gradient-to-t from-bg/90 via-bg/20 to-transparent'
-        }`} />
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        
-        {/* Floating Action Buttons */}
-        <div className={`absolute flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 ${
-          viewMode === 'list' ? 'top-4 right-4 sm:left-4' : 'top-4 right-4'
-        }`}>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-2 bg-bg/80 backdrop-blur-sm rounded-full border border-dimmed/20 hover:border-accent/40 transition-all duration-300"
-          >
-            <Eye size={16} className="text-dimmed group-hover:text-accent transition-colors" />
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-2 bg-bg/80 backdrop-blur-sm rounded-full border border-dimmed/20 hover:border-accent/40 transition-all duration-300"
-          >
-            <Calendar size={16} className="text-dimmed group-hover:text-accent transition-colors" />
-          </motion.div>
-        </div>
+
+        {/* Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-700" />
+        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+        {/* Floating Category Badge */}
+        {project.category && (
+          <div className="absolute top-8 left-8 z-10">
+            <Badge className="bg-bg/60 backdrop-blur-md text-accent border border-accent/30 py-1.5 px-4 rounded-full text-[0.7rem] tracking-[0.2em] font-mono uppercase">
+              {project.category}
+            </Badge>
+          </div>
+        )}
       </div>
 
-      {/* Content */}
-      <div className={`space-y-4 ${viewMode === 'list' ? 'p-4 sm:p-6 flex-1' : 'p-6'}`}>
-        <h3 
-          className={`font-bold text-text group-hover:text-accent transition-colors duration-300 cursor-pointer line-clamp-2 ${
-            viewMode === 'list' ? 'text-lg sm:text-xl' : 'text-xl'
-          }`}
-          onClick={handleNavigateToProject}
-        >
-          {project.title}
-        </h3>
-        <p className={`text-dimmed leading-relaxed line-clamp-3 group-hover:text-text/80 transition-colors duration-300 ${
-          viewMode === 'list' ? 'text-xs sm:text-sm' : 'text-sm'
-        }`}>
-          {project.description}
-        </p>
+      {/* Content Area */}
+      <div className={`relative flex flex-col justify-between p-6 sm:p-8 ${viewMode === 'list' ? 'flex-1' : ''} ${isLarge ? 'lg:p-10' : ''}`}>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h3
+              className={`font-black tracking-tight text-text leading-[1.1] transition-colors duration-500 group-hover:text-accent ${isLarge ? 'text-3xl sm:text-4xl lg:text-5xl' : 'text-2xl sm:text-3xl'
+                }`}
+            >
+              {project.title}
+            </h3>
+            <div className="flex items-center gap-3 text-[0.65rem] font-mono text-dimmed">
+              <span>{project.timeline}</span>
+              <div className="h-1 w-1 bg-dimmed/40 rounded-full" />
+              <span>{project.role}</span>
+            </div>
+          </div>
 
-        <div className="flex flex-wrap gap-2">
-          {project.techStack.slice(0, viewMode === 'list' ? 3 : 4).map((tech, index) => (
-            <Badge
-              key={index}
-              variant="secondary"
-              className="text-xs bg-secondary/20 text-secondary border-secondary/30 hover:bg-secondary/30 transition-colors duration-300"
-            >
-              {tech}
-            </Badge>
-          ))}
-          {project.techStack.length > (viewMode === 'list' ? 3 : 4) && (
-            <Badge
-              variant="secondary"
-              className="text-xs bg-dimmed/20 text-dimmed border-dimmed/30"
-            >
-              +{project.techStack.length - (viewMode === 'list' ? 3 : 4)}
-            </Badge>
-          )}
+          <p className={`text-dimmed leading-relaxed font-light line-clamp-2 group-hover:text-text/80 transition-colors duration-500 ${isLarge ? 'text-base sm:text-lg max-w-2xl' : 'text-sm sm:text-base'
+            }`}>
+            {project.description}
+          </p>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            {project.techStack.map((tech, index) => (
+              <span
+                key={index}
+                className="text-[9px] sm:text-[10px] font-mono text-dimmed/80 bg-dimmed/5 border border-dimmed/10 px-2.5 py-0.5 rounded-full group-hover:border-accent/20 group-hover:text-accent/80 transition-all duration-500"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className={`flex gap-2 sm:gap-3 pt-2 ${viewMode === 'list' ? 'flex-col xs:flex-row' : ''}`}>
-          {project.githubUrl && (
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="flex-1 border-dimmed/30 hover:border-accent/40 hover:bg-accent/5 transition-all duration-300 group/btn"
-            >
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                <Github size={16} className="mr-2 group-hover/btn:text-accent transition-colors" />
-                <span className="hidden xs:inline">Code</span>
-                <span className="xs:hidden">GitHub</span>
+        <div className="flex items-center gap-4 pt-6">
+          <motion.div whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
+            <span className="text-xs font-mono text-accent flex items-center gap-2 group/link">
+              EXPLORE CASE STUDY
+              <ArrowLeft size={14} className="rotate-180 transition-transform group-hover/link:translate-x-1" />
+            </span>
+          </motion.div>
+
+          <div className="h-px flex-1 bg-dimmed/10" />
+
+          <div className="flex gap-2.5">
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 bg-bg/40 border border-dimmed/20 rounded-xl text-dimmed hover:text-accent hover:border-accent/40 transition-all duration-300"
+              >
+                <Github size={18} />
               </a>
-            </Button>
-          )}
-          
-          {project.liveUrl && (
-            <Button
-              size="sm"
-              asChild
-              className="flex-1 bg-accent/20 hover:bg-accent/30 text-accent border border-accent/30 hover:border-accent/50 transition-all duration-300 relative overflow-hidden group/btn"
-            >
-              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink size={16} className="mr-2" />
-                <span className="hidden xs:inline">Live Demo</span>
-                <span className="xs:hidden">Demo</span>
-                
-                {/* Animated Border */}
-                <div className="absolute inset-0 border border-accent/50 rounded-md opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 animate-pulse" />
+            )}
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 bg-bg/40 border border-dimmed/20 rounded-xl text-dimmed hover:text-accent hover:border-accent/40 transition-all duration-300"
+              >
+                <ExternalLink size={18} />
               </a>
-            </Button>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
