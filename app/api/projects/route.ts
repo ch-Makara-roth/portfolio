@@ -4,81 +4,67 @@ export interface Project {
   id: string
   title: string
   description: string
+  longDescription?: string
   image: string
   techStack: string[]
   githubUrl: string
   liveUrl: string
   featured: boolean
+  category?: string
+  role?: string
+  timeline?: string
+  features?: string[]
 }
 
 const mockProjects: Project[] = [
   {
     id: '1',
-    title: 'E-Commerce Platform',
-    description: 'A full-stack e-commerce platform built with Next.js, featuring user authentication, payment processing, and admin dashboard. Includes real-time inventory management and order tracking.',
-    image: '/images/projects/ecommerce.jpg',
-    techStack: ['Next.js', 'TypeScript', 'Prisma', 'PostgreSQL', 'Stripe', 'Tailwind CSS'],
-    githubUrl: 'https://github.com/yourusername/ecommerce-platform',
-    liveUrl: 'https://ecommerce-demo.vercel.app',
-    featured: true
+    title: 'Online Tools',
+    category: 'SaaS Tool',
+    description: 'An all-in-one suite of online tools designed for daily tasks like image compression, PDF editing, and QR code generation.',
+    longDescription: 'OnlineTools is a comprehensive platform providing essential digital utilities. It features advanced image compression algorithms, PDF manipulation tools, and a custom QR code generator. Built with a focus on speed and user privacy, it offers a seamless experience with no registration required.',
+    image: '/images/projects/online-tools.png',
+    techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Radix UI', 'Shadcn UI'],
+    githubUrl: 'https://github.com/ch-Makara-roth/online-tools',
+    liveUrl: 'https://online-tools.chhuonmakararoth.site/',
+    featured: true,
+    role: 'Solo Developer',
+    timeline: '2025',
+    features: [
+      'Image Compression & Resizing',
+      'PDF Editing Tools',
+      'QR Code Generation',
+      'Command Palette (Cmd+K)',
+      'No Registration Required'
+    ]
   },
   {
     id: '2',
-    title: 'Task Management App',
-    description: 'A collaborative task management application with real-time updates, drag-and-drop functionality, and team collaboration features. Built with modern React patterns.',
-    image: '/images/projects/taskmanager.jpg',
-    techStack: ['React', 'Node.js', 'Socket.io', 'MongoDB', 'Express', 'Material-UI'],
-    githubUrl: 'https://github.com/yourusername/task-manager',
-    liveUrl: 'https://taskmanager-demo.netlify.app',
-    featured: true
-  },
-  {
-    id: '3',
-    title: 'Weather Dashboard',
-    description: 'A responsive weather dashboard that displays current conditions, forecasts, and weather maps. Features location-based weather data and beautiful visualizations.',
-    image: '/images/projects/weather.jpg',
-    techStack: ['Vue.js', 'Chart.js', 'OpenWeather API', 'Vuetify', 'PWA'],
-    githubUrl: 'https://github.com/yourusername/weather-dashboard',
-    liveUrl: 'https://weather-dashboard-demo.vercel.app',
-    featured: true
-  },
-  {
-    id: '4',
-    title: 'Blog CMS',
-    description: 'A headless content management system for blogs with markdown support, SEO optimization, and multi-author capabilities.',
-    image: '/images/projects/blog-cms.jpg',
-    techStack: ['Gatsby', 'GraphQL', 'Contentful', 'React', 'Styled Components'],
-    githubUrl: 'https://github.com/yourusername/blog-cms',
-    liveUrl: 'https://blog-cms-demo.netlify.app',
-    featured: false
-  },
-  {
-    id: '5',
-    title: 'Fitness Tracker',
-    description: 'A mobile-first fitness tracking application with workout logging, progress visualization, and social features for sharing achievements.',
-    image: '/images/projects/fitness.jpg',
-    techStack: ['React Native', 'Firebase', 'Redux', 'Chart.js', 'Expo'],
-    githubUrl: 'https://github.com/yourusername/fitness-tracker',
-    liveUrl: 'https://fitness-tracker-demo.expo.dev',
-    featured: false
-  },
-  {
-    id: '6',
-    title: 'Portfolio Website',
-    description: 'A modern, responsive portfolio website showcasing projects and skills. Built with performance and accessibility in mind.',
-    image: '/images/projects/portfolio.jpg',
-    techStack: ['Next.js', 'TypeScript', 'Framer Motion', 'Tailwind CSS', 'Vercel'],
-    githubUrl: 'https://github.com/yourusername/portfolio',
-    liveUrl: 'https://yourportfolio.vercel.app',
-    featured: false
+    title: 'The Modern Walk',
+    category: 'E-Commerce Store',
+    description: 'A high-end e-commerce concept store focusing on premium performance footwear and minimalist shoe design.',
+    longDescription: 'An immersive shopping experience for high-performance footwear. The Modern Walk blends athletic engineering with street style, featuring high-quality product spotlights, interactive UI elements, and a minimalist design aesthetic that emphasizes the products.',
+    image: '/images/projects/shoe-shop.png',
+    techStack: ['Next.js', 'Framer Motion', 'Tailwind CSS', 'Vercel'],
+    githubUrl: 'https://github.com/ch-Makara-roth/shoe-shop-v1',
+    liveUrl: 'https://shoe-shop-fawn.vercel.app/',
+    featured: true,
+    role: 'Solo Developer',
+    timeline: '2026',
+    features: [
+      'Interactive Product Spotlight',
+      'Minimalist UI/UX',
+      'Performance Optimized',
+      'Responsive Design',
+      'Custom Animations'
+    ]
   }
 ]
 
 export async function GET() {
   try {
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 100))
-    
+
     return NextResponse.json(mockProjects)
   } catch (error) {
     console.error('Error fetching projects:', error)
