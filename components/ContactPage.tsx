@@ -149,7 +149,19 @@ export default function ContactPage() {
   }, [])
 
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<ContactForm>({
-    resolver: zodResolver(contactSchema)
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      subject: '',
+      message: '',
+      turnstileToken: '',
+      phone: '',
+      company: '',
+      website: '',
+      budget: '',
+      timeline: '',
+    }
   })
 
   const onSubmit = async (data: ContactForm) => {
