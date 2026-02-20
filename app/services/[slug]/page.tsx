@@ -54,7 +54,7 @@ export default function ServiceDetailPage({ params }: PageProps) {
     const Icon = iconMap[service.icon] || Code
 
     return (
-        <div className="relative min-h-screen bg-bg overflow-hidden" ref={containerRef}>
+        <div className="relative min-h-screen bg-bg overflow-hidden mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12 lg:py-16" ref={containerRef}>
             {/* Dynamic Background */}
             <ServiceBackground color={service.color} />
 
@@ -66,14 +66,14 @@ export default function ServiceDetailPage({ params }: PageProps) {
                     transition={{ duration: 0.5 }}
                     className="mb-8 sm:mb-12"
                 >
-                    <Link href="/services">
-                        <Button variant="ghost" className="group text-dimmed hover:text-text hover:bg-white/5 pl-2 pr-4 rounded-full transition-all">
+                    <Button asChild variant="ghost" className="group text-dimmed hover:text-text hover:bg-white/5 pl-2 pr-4 rounded-full transition-all">
+                        <Link href="/services">
                             <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mr-2 group-hover:bg-accent group-hover:text-white transition-colors">
                                 <ArrowLeft className="h-4 w-4" />
                             </div>
                             Back to Services
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                 </motion.div>
 
                 {/* Hero Section */}
@@ -106,12 +106,16 @@ export default function ServiceDetailPage({ params }: PageProps) {
                         </p>
 
                         <div className="flex flex-wrap gap-4">
-                            <Button size="lg" className={`bg-gradient-to-r ${service.color} text-white hover:opacity-90 border-0 shadow-lg shadow-accent/20 rounded-xl px-8`}>
-                                Start Project
-                                <ArrowRight className="ml-2 h-4 w-4" />
+                            <Button asChild size="lg" className={`bg-gradient-to-r ${service.color} text-white hover:opacity-90 border-0 shadow-lg shadow-accent/20 rounded-xl px-8`}>
+                                <Link href="/contact">
+                                    Start Project
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
                             </Button>
-                            <Button size="lg" variant="outline" className="border-dimmed/20 hover:bg-white/5 rounded-xl px-8">
-                                View Portfolio
+                            <Button asChild size="lg" variant="outline" className="border-dimmed/20 hover:bg-white/5 rounded-xl px-8">
+                                <Link href="/projects">
+                                    View Portfolio
+                                </Link>
                             </Button>
                         </div>
                     </motion.div>
@@ -262,17 +266,17 @@ export default function ServiceDetailPage({ params }: PageProps) {
                             Let's create something extraordinary together.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <Link href="/contact">
-                                <Button className="h-14 px-8 rounded-full bg-text text-bg hover:bg-accent hover:text-white text-lg font-medium transition-all duration-300 shadow-xl hover:shadow-accent/25">
+                            <Button asChild className="h-14 px-8 rounded-full bg-text text-bg hover:bg-accent hover:text-white text-lg font-medium transition-all duration-300 shadow-xl hover:shadow-accent/25">
+                                <Link href="/contact">
                                     Start Your Project
                                     <ArrowRight className="ml-2 h-5 w-5" />
-                                </Button>
-                            </Link>
-                            <Link href="/portfolio">
-                                <Button variant="ghost" className="h-14 px-8 rounded-full text-dimmed hover:text-text hover:bg-white/5 text-lg">
+                                </Link>
+                            </Button>
+                            <Button asChild variant="ghost" className="h-14 px-8 rounded-full text-dimmed hover:text-text hover:bg-white/5 text-lg">
+                                <Link href="/projects">
                                     See Our Work
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
                         </div>
                     </div>
                 </motion.div>

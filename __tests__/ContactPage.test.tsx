@@ -36,10 +36,10 @@ describe('ContactPage', () => {
   it('renders contact form with all fields', () => {
     render(<ContactPage />)
 
-    expect(screen.getByPlaceholderText('Your Name')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Your Email')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Subject')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Tell me about your project...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('John Doe')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('john@example.com')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Project Inquiry')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Tell me about your amazing project...')).toBeInTheDocument()
     expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /send message/i })).toBeInTheDocument()
   })
@@ -68,7 +68,7 @@ describe('ContactPage', () => {
     const user = userEvent.setup()
     render(<ContactPage />)
 
-    const emailInput = screen.getByPlaceholderText('Your Email')
+    const emailInput = screen.getByPlaceholderText('john@example.com')
     await user.type(emailInput, 'invalid-email')
 
     // Complete captcha to enable submit button
@@ -104,10 +104,10 @@ describe('ContactPage', () => {
     render(<ContactPage />)
 
     // Fill out form
-    await user.type(screen.getByPlaceholderText('Your Name'), 'John Doe')
-    await user.type(screen.getByPlaceholderText('Your Email'), 'john@example.com')
-    await user.type(screen.getByPlaceholderText('Subject'), 'Test Subject')
-    await user.type(screen.getByPlaceholderText('Tell me about your project...'), 'This is a test message with more than 20 characters')
+    await user.type(screen.getByPlaceholderText('John Doe'), 'John Doe')
+    await user.type(screen.getByPlaceholderText('john@example.com'), 'john@example.com')
+    await user.type(screen.getByPlaceholderText('Project Inquiry'), 'Test Subject')
+    await user.type(screen.getByPlaceholderText('Tell me about your amazing project...'), 'This is a test message with more than 20 characters')
 
     // Complete captcha
     const captchaButton = screen.getByText('Complete Captcha')
@@ -148,10 +148,10 @@ describe('ContactPage', () => {
     render(<ContactPage />)
 
     // Fill out form and submit
-    await user.type(screen.getByPlaceholderText('Your Name'), 'John Doe')
-    await user.type(screen.getByPlaceholderText('Your Email'), 'john@example.com')
-    await user.type(screen.getByPlaceholderText('Subject'), 'Test Subject')
-    await user.type(screen.getByPlaceholderText('Tell me about your project...'), 'This is a test message with more than 20 characters')
+    await user.type(screen.getByPlaceholderText('John Doe'), 'John Doe')
+    await user.type(screen.getByPlaceholderText('john@example.com'), 'john@example.com')
+    await user.type(screen.getByPlaceholderText('Project Inquiry'), 'Test Subject')
+    await user.type(screen.getByPlaceholderText('Tell me about your amazing project...'), 'This is a test message with more than 20 characters')
 
     const captchaButton = screen.getByText('Complete Captcha')
     await user.click(captchaButton)
@@ -160,7 +160,7 @@ describe('ContactPage', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/message sent successfully/i)).toBeInTheDocument()
+      expect(screen.getByText(/message sparked/i)).toBeInTheDocument()
     })
   })
 
@@ -177,10 +177,10 @@ describe('ContactPage', () => {
     render(<ContactPage />)
 
     // Fill out form and submit
-    await user.type(screen.getByPlaceholderText('Your Name'), 'John Doe')
-    await user.type(screen.getByPlaceholderText('Your Email'), 'john@example.com')
-    await user.type(screen.getByPlaceholderText('Subject'), 'Test Subject')
-    await user.type(screen.getByPlaceholderText('Tell me about your project...'), 'This is a test message with more than 20 characters')
+    await user.type(screen.getByPlaceholderText('John Doe'), 'John Doe')
+    await user.type(screen.getByPlaceholderText('john@example.com'), 'john@example.com')
+    await user.type(screen.getByPlaceholderText('Project Inquiry'), 'Test Subject')
+    await user.type(screen.getByPlaceholderText('Tell me about your amazing project...'), 'This is a test message with more than 20 characters')
 
     const captchaButton = screen.getByText('Complete Captcha')
     await user.click(captchaButton)
@@ -199,10 +199,10 @@ describe('ContactPage', () => {
     const user = userEvent.setup()
     render(<ContactPage />)
 
-    const nameInput = screen.getByPlaceholderText('Your Name') as HTMLInputElement
-    const emailInput = screen.getByPlaceholderText('Your Email') as HTMLInputElement
-    const subjectInput = screen.getByPlaceholderText('Subject') as HTMLInputElement
-    const messageInput = screen.getByPlaceholderText('Tell me about your project...') as HTMLTextAreaElement
+    const nameInput = screen.getByPlaceholderText('John Doe') as HTMLInputElement
+    const emailInput = screen.getByPlaceholderText('john@example.com') as HTMLInputElement
+    const subjectInput = screen.getByPlaceholderText('Project Inquiry') as HTMLInputElement
+    const messageInput = screen.getByPlaceholderText('Tell me about your amazing project...') as HTMLTextAreaElement
 
     // Fill out form
     await user.type(nameInput, 'John Doe')
@@ -217,15 +217,15 @@ describe('ContactPage', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/message sent successfully/i)).toBeInTheDocument()
+      expect(screen.getByText(/message sparked/i)).toBeInTheDocument()
     }, { timeout: 3000 })
 
     // Re-query inputs after reset to get updated values
     await waitFor(() => {
-      const updatedNameInput = screen.getByPlaceholderText('Your Name') as HTMLInputElement
-      const updatedEmailInput = screen.getByPlaceholderText('Your Email') as HTMLInputElement
-      const updatedSubjectInput = screen.getByPlaceholderText('Subject') as HTMLInputElement
-      const updatedMessageInput = screen.getByPlaceholderText('Tell me about your project...') as HTMLTextAreaElement
+      const updatedNameInput = screen.getByPlaceholderText('John Doe') as HTMLInputElement
+      const updatedEmailInput = screen.getByPlaceholderText('john@example.com') as HTMLInputElement
+      const updatedSubjectInput = screen.getByPlaceholderText('Project Inquiry') as HTMLInputElement
+      const updatedMessageInput = screen.getByPlaceholderText('Tell me about your amazing project...') as HTMLTextAreaElement
 
       expect(updatedNameInput.value).toBe('')
       expect(updatedEmailInput.value).toBe('')
@@ -245,10 +245,10 @@ describe('ContactPage', () => {
     render(<ContactPage />)
 
     // Fill out form
-    await user.type(screen.getByPlaceholderText('Your Name'), 'John Doe')
-    await user.type(screen.getByPlaceholderText('Your Email'), 'john@example.com')
-    await user.type(screen.getByPlaceholderText('Subject'), 'Test Subject')
-    await user.type(screen.getByPlaceholderText('Tell me about your project...'), 'This is a test message with more than 20 characters')
+    await user.type(screen.getByPlaceholderText('John Doe'), 'John Doe')
+    await user.type(screen.getByPlaceholderText('john@example.com'), 'john@example.com')
+    await user.type(screen.getByPlaceholderText('Project Inquiry'), 'Test Subject')
+    await user.type(screen.getByPlaceholderText('Tell me about your amazing project...'), 'This is a test message with more than 20 characters')
 
     const captchaButton = screen.getByText('Complete Captcha')
     await user.click(captchaButton)

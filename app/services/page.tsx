@@ -10,7 +10,8 @@ import {
   Database,
   Globe,
   Shield,
-  ArrowRight
+  ArrowRight,
+  Briefcase
 } from 'lucide-react'
 import { mockServices } from '@/lib/mockData'
 import Link from 'next/link'
@@ -51,19 +52,28 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen sm:pb-20 md:pb-32 py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-8 sm:mb-12 md:mb-16"
-        >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 sm:mb-6 bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent px-2">
-            Services
-          </h1>
-          <p className="text-base sm:text-lg text-dimmed max-w-2xl mx-auto px-4 leading-relaxed">
-            Comprehensive web development services to bring your digital vision to life.
-          </p>
-        </motion.div>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 md:mb-24">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-2xl"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 mb-6">
+              <Briefcase size={14} className="text-secondary" />
+              <span className="text-xs font-bold uppercase tracking-widest text-secondary">What I Do</span>
+            </div>
+            <h1 className="text-5xl sm:text-6xl md:text-8xl font-black mb-6 tracking-tighter">
+              Digital <br />
+              <span className="bg-gradient-to-r from-accent via-secondary to-accent bg-clip-text text-transparent bg-[length:200%_100%] animate-gradient">
+                Services.
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-dimmed leading-relaxed">
+              Comprehensive web development services to bring your digital vision to life, from pixel-perfect frontends to robust backend architectures.
+            </p>
+          </motion.div>
+        </div>
 
         <motion.section
           initial={{ opacity: 0, y: 20 }}

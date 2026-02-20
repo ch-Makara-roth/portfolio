@@ -1137,9 +1137,9 @@ A well-designed database is the foundation of a scalable application. Invest tim
 // Mock About Data
 export const mockAboutData: AboutData = {
   personalInfo: {
-    name: 'Chhuon Makara Roth',
+    name: ' Makara Roth',
     title: 'Frontend Developer',
-    location: 'Khan Tuol Koak, Phnom Penh, Cambodia',
+    location: 'Phnom Penh, Cambodia',
     phone: '(+855) 81693071',
     email: 'chhuonmakararoth@gmail.com',
 
