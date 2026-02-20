@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
-import { Calendar, MapPin, Coffee, Code, Link, Download, Phone, Mail } from 'lucide-react'
+import { Calendar, MapPin, Coffee, Code, Link, Download, Phone, Mail, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { AboutData } from '@/lib/mockData'
@@ -24,7 +24,7 @@ export default function AboutPage() {
         setLoading(true)
         const response = await fetch('/api/about')
         const result = await response.json()
-        
+
         if (result.success) {
           setAboutData(result.data)
         } else {
@@ -54,11 +54,11 @@ export default function AboutPage() {
 
   if (error || !aboutData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-28">
         <div className="text-center">
           <p className="text-red-500 mb-4">Error: {error}</p>
-          <button 
-            onClick={() => isClient && window.location.reload()} 
+          <button
+            onClick={() => isClient && window.location.reload()}
             className="px-4 py-2 bg-accent text-white rounded hover:bg-accent/80"
           >
             Retry
@@ -72,79 +72,180 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12 lg:py-16">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-8 sm:mb-12 md:mb-16"
-        >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light mb-4 sm:mb-6 bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent px-2">
-            About Me
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg text-dimmed max-w-2xl mx-auto px-2 sm:px-4 leading-relaxed">
-            Get to know more about my journey, skills, and passion for creating digital experiences.
-          </p>
-        </motion.div>
-
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 mb-8 sm:mb-12 md:mb-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 md:mb-24">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="flex flex-col items-center lg:items-start"
+            transition={{ duration: 0.8 }}
+            className="max-w-2xl"
           >
-            <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 mx-auto lg:mx-0 mb-4 sm:mb-6 md:mb-8">
-              <Image
-                src={personalInfo.profileImage}
-                alt={`${personalInfo.name} - ${personalInfo.title} portrait`}
-                fill
-                className="object-cover rounded-2xl"
-                sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, (max-width: 1024px) 256px, 320px"
-                priority
-                placeholder="blur"
-                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyEnyLFwzRQV0zFNHqZZLi6yIJhyZCFnJNUKs5lGF7hZm0fRYdDGrXSLDTJVuFZHhZuN7VGWwSzUFGwU4Kp/9k="
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-accent/10 to-transparent rounded-2xl" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 mb-6">
+              <User size={14} className="text-secondary" />
+              <span className="text-xs font-bold uppercase tracking-widest text-secondary">Get to know me</span>
             </div>
-            
-            <div className="space-y-2 sm:space-y-3 md:space-y-4 text-left lg:text-left w-full">
-              <div className="flex items-center justify-start lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
-                <MapPin size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span>{personalInfo.location}</span>
+            <h1 className="text-5xl sm:text-6xl md:text-8xl font-black mb-6 tracking-tighter">
+              Behind the <br />
+              <span className="bg-gradient-to-r from-accent via-secondary to-accent bg-clip-text text-transparent bg-[length:200%_100%] animate-gradient">
+                code.
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-dimmed leading-relaxed">
+              Learn more about my journey, the skills I've gathered along the way, and my passion for crafting digital experiences.
+            </p>
+          </motion.div>
+        </div>
+
+        <div className="grid lg:grid-cols-12 gap-8 sm:gap-12 items-start mb-16 sm:mb-24">
+          {/* Left Column: Profile & Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="lg:col-span-5 space-y-6 sm:space-y-8"
+          >
+            {/* Profile Image Card */}
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-tr from-accent to-secondary rounded-[2.5rem] blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-700" />
+              <div className="relative p-2 bg-bg/50 backdrop-blur-xl border border-white/10 rounded-[2.5rem] overflow-hidden">
+                <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden">
+                  <Image
+                    src={personalInfo.profileImage}
+                    alt={`${personalInfo.name} - ${personalInfo.title}`}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    priority
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyEnyLFwzRQV0zFNHqZZLi6yIJhyZCFnJNUKs5lGF7hZm0fRYdDGrXSLDTJVuFZHhZuN7VGWwSzUFGwU4Kp/9k="
+                  />
+                  {/* Inner Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-80" />
+
+                  {/* Floating Info */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">{personalInfo.name}</h2>
+                    <p className="text-secondary font-medium">{personalInfo.title}</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
-                <Phone size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span>{personalInfo.phone}</span>
-              </div>
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
-                <Mail size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span>{personalInfo.email}</span>
-              </div>
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
-                <Coffee size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span>Coffee Lover</span>
-              </div>
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-dimmed text-xs sm:text-sm md:text-base">
-                <Code size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
-                <span className="text-center lg:text-left">{personalInfo.hobbies.join(', ')}</span>
-              </div>
+
+              {/* Floating Status Badge */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.6, type: "spring", stiffness: 200, damping: 15 }}
+                className="absolute -right-2 top-8 sm:-right-4 sm:top-10 lg:-right-6 lg:top-12 bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 z-20"
+              >
+                <div className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
+                </div>
+                <span className="text-xs sm:text-sm font-semibold text-white">Available for hire</span>
+              </motion.div>
+            </div>
+
+            {/* Quick Info Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {[
+                { icon: MapPin, label: 'Location', value: personalInfo.location, colSpan: '' },
+                { icon: Mail, label: 'Email', value: personalInfo.email, colSpan: 'sm:col-span-2' },
+                { icon: Phone, label: 'Phone', value: personalInfo.phone, colSpan: '' },
+                { icon: Coffee, label: 'Coffee', value: 'Powered by caffeine', colSpan: '' },
+              ].map((item, idx) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + idx * 0.1 }}
+                  className={`group flex flex-col p-4 sm:p-5 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-2xl transition-all duration-300 backdrop-blur-sm ${item.colSpan}`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 rounded-lg bg-white/5 text-accent group-hover:scale-110 group-hover:bg-accent/10 transition-all duration-300">
+                      <item.icon size={16} />
+                    </div>
+                    <span className="text-xs font-semibold text-dimmed uppercase tracking-wider">{item.label}</span>
+                  </div>
+                  <span className="text-sm font-medium text-white/90 break-all sm:break-normal" title={item.value}>{item.value}</span>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
 
+          {/* Right Column: Story & Details */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="flex flex-col justify-center"
+            className="lg:col-span-7 space-y-8 sm:space-y-12 lg:pl-8 lg:pt-8"
           >
-            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-accent mb-3 sm:mb-4 md:mb-6 text-center lg:text-left">My Story</h2>
-            <div className="space-y-2 sm:space-y-3 md:space-y-4 text-text/80 leading-relaxed text-xs sm:text-sm md:text-base px-2 sm:px-0">
-              {personalInfo.story.map((paragraph, index) => (
-                <p key={index}>
-                  {paragraph}
-                </p>
-              ))}
+            {/* Story Section */}
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-sm font-medium mb-6">
+                <Code size={14} />
+                <span>My Background</span>
+              </div>
+
+              <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-8 leading-tight">
+                Crafting digital experiences with <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-secondary">passion & precision</span>
+              </h3>
+
+              <div className="space-y-6 text-dimmed text-base sm:text-lg leading-relaxed">
+                {personalInfo.story.map((paragraph, index) => (
+                  <motion.p
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * index, duration: 0.5 }}
+                    viewport={{ once: true }}
+                    className={index === 0 ? "text-white/90 font-medium text-lg sm:text-xl" : ""}
+                  >
+                    {paragraph}
+                  </motion.p>
+                ))}
+              </div>
             </div>
+
+            {/* Hobbies / Interests */}
+            <div className="pt-8 border-t border-white/10">
+              <h4 className="text-sm font-semibold text-white uppercase tracking-widest mb-4">Interests & Hobbies</h4>
+              <div className="flex flex-wrap gap-3">
+                {personalInfo.hobbies.map((hobby, idx) => (
+                  <motion.div
+                    key={hobby}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 * idx, duration: 0.5 }}
+                    viewport={{ once: true }}
+                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 hover:border-accent/30 text-white/70 hover:text-white transition-all duration-300 font-medium text-sm flex items-center gap-2 cursor-default"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>
+                    {hobby}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Highlight Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-accent/10 via-bg to-secondary/10 border border-white/10 p-8 group"
+            >
+              <div className="absolute inset-0 bg-white/5 group-hover:bg-transparent transition-colors duration-500" />
+              <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center flex-shrink-0 shadow-lg shadow-accent/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                  <Code size={28} className="text-bg" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-white mb-2">Building the Future</h4>
+                  <p className="text-dimmed leading-relaxed">
+                    I believe every line of code is an opportunity to solve a problem and create a meaningful experience. I'm dedicated to building products that matter and scale.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
 
@@ -163,7 +264,7 @@ export default function AboutPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.7 + index * 0.03, duration: 0.3 }}
               >
-                <Badge 
+                <Badge
                   variant="secondary"
                   className="bg-accent/10 text-accent border-accent/20 hover:bg-accent/20 transition-colors cursor-default text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5"
                 >
@@ -326,7 +427,7 @@ export default function AboutPage() {
               My professional experience across different companies and roles
             </p>
           </motion.div>
-          
+
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
             {experiences.map((exp, index) => (
               <motion.div
@@ -334,21 +435,21 @@ export default function AboutPage() {
                 className="group relative"
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                transition={{ 
-                  duration: 0.6, 
+                transition={{
+                  duration: 0.6,
                   delay: index * 0.1,
                   ease: "easeOut"
                 }}
                 viewport={{ once: true, margin: "-50px" }}
               >
                 <div className="relative bg-bg/60 backdrop-blur-sm border border-dimmed/15 rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 lg:p-8 transition-all duration-300 group-hover:border-accent/30 group-hover:bg-bg/80 group-hover:shadow-lg">
-                  
+
                   <div className="absolute left-0 top-3 bottom-3 sm:top-4 sm:bottom-4 md:top-6 md:bottom-6 w-0.5 sm:w-1 bg-gradient-to-b from-accent/50 to-secondary/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  
+
                   <div className="flex flex-col lg:grid lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                     <div className="lg:col-span-2 space-y-2 sm:space-y-3 md:space-y-4">
                       <div>
-                        <motion.h3 
+                        <motion.h3
                           className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-text mb-1 group-hover:text-accent transition-colors duration-300"
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
@@ -357,7 +458,7 @@ export default function AboutPage() {
                         >
                           {exp.role}
                         </motion.h3>
-                        <motion.div 
+                        <motion.div
                           className="flex flex-col sm:flex-row sm:items-center gap-1 md:gap-2 text-dimmed"
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
@@ -368,7 +469,7 @@ export default function AboutPage() {
                           <span className="hidden sm:inline">•</span>
                           <span className="text-accent/80 font-medium text-xs sm:text-sm md:text-base">{exp.type}</span>
                         </motion.div>
-                        <motion.div 
+                        <motion.div
                           className="flex items-center gap-2 text-dimmed mt-1 md:mt-2"
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
@@ -379,9 +480,9 @@ export default function AboutPage() {
                           <span className="text-xs sm:text-sm">{exp.location}</span>
                         </motion.div>
                       </div>
-                      
+
                       {exp.skills && (
-                        <motion.div 
+                        <motion.div
                           className="space-y-1.5 sm:space-y-2 md:space-y-3"
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
@@ -399,9 +500,9 @@ export default function AboutPage() {
                                 className="px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 bg-accent/10 text-accent text-xs sm:text-sm rounded-full border border-accent/20 hover:bg-accent/20 hover:border-accent/40 transition-all duration-200 cursor-default"
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
-                                transition={{ 
-                                  delay: index * 0.1 + skillIndex * 0.05 + 0.6, 
-                                  duration: 0.3 
+                                transition={{
+                                  delay: index * 0.1 + skillIndex * 0.05 + 0.6,
+                                  duration: 0.3
                                 }}
                                 viewport={{ once: true, margin: "-50px" }}
                                 whileHover={{ scale: 1.05 }}
@@ -413,9 +514,9 @@ export default function AboutPage() {
                         </motion.div>
                       )}
                     </div>
-                    
+
                     <div className="lg:col-span-1 flex flex-col items-start lg:items-end justify-start mt-1 sm:mt-2 lg:mt-0">
-                      <motion.div 
+                      <motion.div
                         className="text-left lg:text-right"
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -427,8 +528,8 @@ export default function AboutPage() {
                           <span className="whitespace-nowrap">{exp.period}</span>
                         </div>
                       </motion.div>
-                      
-                      <motion.div 
+
+                      <motion.div
                         className="mt-1.5 sm:mt-2 md:mt-4 flex items-center gap-1.5 sm:gap-2 text-dimmed"
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -442,12 +543,12 @@ export default function AboutPage() {
                       </motion.div>
                     </div>
                   </div>
-                  
+
                   <div className="absolute -inset-1 bg-gradient-to-r from-accent/10 via-secondary/10 to-accent/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm"></div>
                 </div>
-                
+
                 {index < experiences.length - 1 && (
-                  <motion.div 
+                  <motion.div
                     className="absolute left-4 sm:left-6 md:left-8 -bottom-2 sm:-bottom-3 md:-bottom-4 w-0.5 h-4 sm:h-6 md:h-8 bg-gradient-to-b from-dimmed/30 to-transparent"
                     initial={{ scaleY: 0 }}
                     whileInView={{ scaleY: 1 }}
@@ -480,7 +581,7 @@ export default function AboutPage() {
                 Ready to work together?
               </h2>
               <p className="text-xs sm:text-sm md:text-base lg:text-lg text-dimmed mb-4 sm:mb-6 md:mb-8 max-w-2xl mx-auto px-2">
-                Let's create something amazing together. I'm available for freelance projects, 
+                Let's create something amazing together. I'm available for freelance projects,
                 full-time opportunities, and consulting work.
               </p>
               <a href="/contact" className="flex justify-center items-center">

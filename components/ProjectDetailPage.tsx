@@ -18,6 +18,7 @@ interface ProjectDetailPageProps {
 export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
   const router = useRouter()
   const [imageLoaded, setImageLoaded] = useState(false)
+  const [previewMode, setPreviewMode] = useState<'image' | 'iframe'>(project.liveUrl ? 'iframe' : 'image')
 
   // Motion variants
   const fadeInUp = {
@@ -135,28 +136,73 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
                 </div>
               </motion.div>
 
-              {/* Parallax Image Section */}
+              {/* Interactive Browser Mockup / Parallax Image Section */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="relative aspect-[4/5] rounded-[3rem] overflow-hidden group shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-dimmed/10"
+                className="relative w-full aspect-[4/5] sm:aspect-[4/3] lg:aspect-auto lg:h-[650px] rounded-[2rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-dimmed/10 flex flex-col bg-bg/40 backdrop-blur-xl group"
               >
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  className={`object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.2,0,0,1)] group-hover:scale-110 ${imageLoaded ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  onLoad={() => setImageLoaded(true)}
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent opacity-60" />
-                {!imageLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-bg/20 backdrop-blur-2xl">
-                    <div className="w-12 h-12 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+                {/* Browser Header Bar */}
+                <div className="flex items-center px-4 py-3 border-b border-dimmed/10 bg-black/40 backdrop-blur-md relative z-20 shrink-0">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
                   </div>
-                )}
+
+                  <div className="mx-auto flex-1 max-w-[60%] flex justify-center">
+                    <div className="w-full max-w-[300px] bg-bg/50 text-dimmed/70 text-[10px] font-mono py-1.5 px-3 rounded-md text-center border border-dimmed/10 flex items-center justify-center gap-2 truncate opacity-70 group-hover:opacity-100 transition-opacity">
+                      <span className="shrink-0"><ExternalLink size={10} className="text-emerald-500" /></span>
+                      <span className="truncate">{project.liveUrl ? project.liveUrl.replace(/^https?:\/\//, '') : `${project.title.toLowerCase().replace(/\s+/g, '-')}.local`}</span>
+                    </div>
+                  </div>
+
+                  {project.liveUrl && (
+                    <div className="flex items-center absolute right-4">
+                      <button
+                        onClick={() => setPreviewMode(prev => prev === 'image' ? 'iframe' : 'image')}
+                        className="text-[10px] uppercase font-mono tracking-wider px-3 py-1.5 rounded-full border border-dimmed/20 hover:border-accent/40 bg-bg/50 hover:bg-accent/10 hover:text-accent transition-all duration-300"
+                      >
+                        {previewMode === 'image' ? 'Live Preview' : 'Close Preview'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Main Content Area (Image or Iframe) */}
+                <div className="relative flex-1 bg-black/50 overflow-hidden w-full h-full">
+                  {previewMode === 'iframe' && project.liveUrl ? (
+                    <div className="w-full h-full bg-white relative">
+                      <iframe
+                        src={project.liveUrl}
+                        className="w-full h-full border-0 absolute inset-0 z-10 bg-white"
+                        sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+                        title={`${project.title} Preview`}
+                      />
+                      <div className="absolute inset-0 z-0 flex items-center justify-center bg-bg">
+                        <div className="w-12 h-12 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        fill
+                        className={`object-cover object-top transition-all duration-[2s] ease-[cubic-bezier(0.2,0,0,1)] group-hover:scale-105 group-hover:object-center ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                        onLoad={() => setImageLoaded(true)}
+                        priority
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent opacity-60 pointer-events-none" />
+                      {!imageLoaded && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-bg/20 backdrop-blur-2xl">
+                          <div className="w-12 h-12 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </motion.div>
             </section>
 

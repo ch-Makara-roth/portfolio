@@ -34,10 +34,10 @@ export function generateMetadata({
     authors: [{ name: baseMetadata.author }],
     creator: baseMetadata.author,
     publisher: baseMetadata.author,
-    
+
     // Add metadataBase to resolve social media images
     metadataBase: new URL(baseMetadata.siteUrl),
-    
+
     // Open Graph
     openGraph: {
       title: fullTitle,
@@ -55,16 +55,15 @@ export function generateMetadata({
       locale: 'en_US',
       type: type,
     },
-    
+
     // Twitter
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
       description: fullDescription,
       images: [image],
-      creator: '@your-twitter-handle', // Replace with your Twitter handle
     },
-    
+
     // Additional SEO
     robots: {
       index: true,
@@ -77,25 +76,26 @@ export function generateMetadata({
         'max-snippet': -1,
       },
     },
-    
+
     // Canonical URL
     alternates: {
       canonical: fullUrl,
     },
-    
+
     // App-specific
     appleWebApp: {
       capable: true,
       statusBarStyle: 'black-translucent',
     },
-    
-    // Verification (add your verification codes)
+
+    // Verification
     verification: {
-      google: 'your-google-verification-code',
-      yandex: 'your-yandex-verification-code',
-      yahoo: 'your-yahoo-verification-code',
+      google: 'E2xuGpkJrX7W9CRPK1KB7_Dnkbu2XFdAFBg_ZPB3u2k',
+      other: {
+        'ahrefs-site-verification': 'f43fe6af70c9d1572d89e0196a750c104ea2d87416d7ec4a5c88fbdb4f4667de',
+      },
     },
-    
+
     // Additional metadata
     category: 'Technology',
   }
@@ -130,7 +130,7 @@ export function generateStructuredData(type: 'person' | 'website' | 'article' | 
         ],
         ...data,
       }
-    
+
     case 'website':
       return {
         ...baseStructuredData,
@@ -145,7 +145,7 @@ export function generateStructuredData(type: 'person' | 'website' | 'article' | 
         },
         ...data,
       }
-    
+
     case 'article':
       return {
         ...baseStructuredData,
@@ -187,7 +187,7 @@ export function generateStructuredData(type: 'person' | 'website' | 'article' | 
         url: data.url,
         ...data,
       }
-    
+
     default:
       return baseStructuredData
   }
