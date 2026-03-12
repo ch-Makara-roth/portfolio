@@ -5,147 +5,185 @@ import { Button } from '@/components/ui/button'
 import ShinyText from '@/components/animations/ShinyText/ShinyText';
 import StarryBackground from '@/components/animations/StarryBackground';
 import Link from 'next/link'
-import { ArrowRight, Download } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react';
+import { ArrowRight, Mail, Github, Linkedin, ChevronDown } from 'lucide-react'
+import { useState, useEffect } from 'react';
+
+const SKILLS = [
+  { category: 'Frontend', icon: '⚡', skills: 'React, Next.js, Vue, TypeScript' },
+  { category: 'Backend',  icon: '🛠️', skills: 'Node.js, Laravel, PostgreSQL' },
+  { category: 'Design',   icon: '🎨', skills: 'Figma, Tailwind CSS, Framer Motion' },
+  { category: 'DevOps',   icon: '🚀', skills: 'Docker, AWS, CI/CD, Git' },
+  { category: 'Mobile',   icon: '📱', skills: 'React Native, Flutter, iOS' },
+]
 
 export default function HomePage() {
-  const [skills, setSkills] = useState([
-    { category: 'Frontend', skills: 'React, Next.js, Vue, TypeScript' },
-    { category: 'Backend', skills: 'Node.js, Laravel, PostgreSQL' },
-    { category: 'Design', skills: 'Figma, Tailwind CSS, Framer Motion' },
-    { category: 'DevOps', skills: 'Docker, AWS, CI/CD, Git' },
-    { category: 'Mobile', skills: 'React Native, Flutter, iOS' }
-  ])
-  
-  const [useStarryBackground, setUseStarryBackground] = useState(true)
-  const [shouldLoadVideo, setShouldLoadVideo] = useState(false)
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false)
   const [isClient, setIsClient] = useState(false)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  
+
   useEffect(() => {
     setIsClient(true)
   }, [])
-  
-  useEffect(() => {
-    if (!isClient) return
-    
-    // Check user's data preference and connection for video fallback
-    const prefersReducedData = window.matchMedia('(prefers-reduced-data: reduce)').matches
-    const isSlowConnection = (navigator as any).connection && (navigator as any).connection.effectiveType === 'slow-2g'
-    
-    // Default to starry background, but allow video as option
-    if (!prefersReducedData && !isSlowConnection && !useStarryBackground) {
-      const timer = setTimeout(() => {
-        setShouldLoadVideo(true)
-      }, 1000)
-      
-      return () => clearTimeout(timer)
-    }
-  }, [useStarryBackground, isClient])
-  
+
   return (
-    <div className="h-screen flex items-center justify-center max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Starry Background - Default */}
-      {useStarryBackground && (
-        <StarryBackground 
-          speed={0.8}
-          starCount={150}
-          nebulaColor="#4a0e4f"
-          className="z-0"
-        />
-      )}
-      
+    <div className="min-h-screen flex flex-col items-center justify-center pb-24 sm:pb-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Starry Background */}
+      <StarryBackground
+        speed={0.8}
+        starCount={150}
+        nebulaColor="#4a0e4f"
+        className="z-0"
+      />
 
-      
-      {/* Fallback background when video is not loaded */}
-      {!useStarryBackground && !isVideoLoaded && (
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 z-0"></div>
-      )}
-       
+      {/* Overlay for text readability */}
+      <div className="absolute inset-0 bg-black/20 z-10" />
 
-      
-      {/* Overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/20 z-10"></div>
-      <div className="max-w-4xl mx-auto text-center relative z-20">
+      {/* Hero content */}
+      <div className="max-w-4xl w-full mx-auto text-center relative z-20 pt-24 sm:pt-28">
+
+        {/* Available badge */}
+        <motion.div
+          className="flex justify-center mb-6"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/5 text-accent text-xs sm:text-sm font-medium backdrop-blur-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+            </span>
+            Available for work
+          </span>
+        </motion.div>
+
+        {/* Name */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <ShinyText 
-            text="Chhuon Makara Roth" 
-            speed={2.5} 
-            className='text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-bold mb-4 sm:mb-6 px-2'
+          <ShinyText
+            text="Chhuon Makara Roth"
+            speed={2.5}
+            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold mb-4 sm:mb-5 px-2 leading-tight"
           />
-          
-          <motion.p 
-            className="text-lg sm:text-xl md:text-2xl text-dimmed mb-6 sm:mb-8 px-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-          >
-            Full Stack Developer
-          </motion.p>
-          
-          <motion.p 
-            className="text-sm sm:text-base md:text-lg text-text/80 mb-8 sm:mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed px-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-          >
-            I craft modern web experiences using cutting-edge technologies. 
-            Specializing in React, Next.js, and full-stack development.
-          </motion.p>
-          
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4 mb-8 sm:mb-0"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.8 }}
-          >
-            <Link href="/projects" className="w-full sm:w-auto">
-              <Button 
-                className="w-full sm:w-auto bg-accent hover:bg-accent/80 text-bg font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
-                size="lg"
-              >
-                View Projects
-                <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
-              </Button>
-            </Link>
-            
-            <Link href="/contact" className="w-full sm:w-auto">
-              <Button 
-                variant="outline"
-                className="w-full sm:w-auto border-secondary text-secondary hover:bg-secondary/10 px-6 sm:px-8 py-3 sm:py-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
-                size="lg"
-              >
-                Hire Me
-                <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
-              </Button>
-            </Link>
-          </motion.div>
         </motion.div>
-        
+
+        {/* Role badge */}
         <motion.div
-          className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto px-4"
+          className="flex justify-center mb-5 sm:mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+        >
+          <span className="inline-block px-4 py-1.5 rounded-full border border-secondary/40 bg-secondary/10 text-secondary text-sm sm:text-base md:text-lg font-semibold tracking-wide">
+            Full Stack Developer
+          </span>
+        </motion.div>
+
+        {/* Description */}
+        <motion.p
+          className="text-sm sm:text-base md:text-lg text-text/70 mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed px-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+        >
+          I craft modern web experiences using cutting-edge technologies.
+          Specializing in React, Next.js, and full-stack development.
+        </motion.p>
+
+        {/* CTA Buttons */}
+        <motion.div
+          className="flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center items-center px-4 mb-6 sm:mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.8 }}
+        >
+          <Link href="/projects" className="w-full xs:w-auto">
+            <Button
+              className="w-full xs:w-auto bg-accent hover:bg-accent/80 text-bg font-semibold px-7 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg shadow-accent/20 hover:shadow-accent/40"
+              size="lg"
+            >
+              View Projects
+              <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
+            </Button>
+          </Link>
+
+          <Link href="/contact" className="w-full xs:w-auto">
+            <Button
+              variant="outline"
+              className="w-full xs:w-auto border-secondary/60 text-secondary hover:bg-secondary/10 hover:border-secondary px-7 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+              size="lg"
+            >
+              Hire Me
+              <Mail size={16} className="sm:w-[18px] sm:h-[18px]" />
+            </Button>
+          </Link>
+        </motion.div>
+
+        {/* Social links */}
+        <motion.div
+          className="flex justify-center items-center gap-4 mb-12 sm:mb-16"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.8 }}
+        >
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="p-2 rounded-full text-dimmed hover:text-accent border border-transparent hover:border-accent/30 hover:bg-accent/5 transition-all duration-200"
+          >
+            <Github size={20} />
+          </a>
+          <a
+            href="https://linkedin.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className="p-2 rounded-full text-dimmed hover:text-accent border border-transparent hover:border-accent/30 hover:bg-accent/5 transition-all duration-200"
+          >
+            <Linkedin size={20} />
+          </a>
+        </motion.div>
+
+        {/* Skills grid */}
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 max-w-4xl mx-auto px-2"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.8 }}
         >
-          { skills ?  skills.map((skill, index) => (
-            <div key={index} className="text-center p-3 sm:p-4 bg-bg/20 backdrop-blur-sm rounded-xl border border-accent/10 hover:border-accent/20 transition-all duration-300">
-              <h3 className="text-accent font-semibold mb-2 text-xs sm:text-sm lg:text-base">{skill.category}</h3>
-              <p className="text-dimmed text-xs sm:text-sm leading-relaxed">{skill.skills}</p>
+          {SKILLS.map((skill, index) => (
+            <div
+              key={index}
+              className="group text-center p-3 sm:p-4 bg-bg/20 backdrop-blur-sm rounded-xl border border-accent/10 hover:border-accent/40 hover:bg-accent/5 hover:shadow-lg hover:shadow-accent/10 transition-all duration-300"
+            >
+              <div className="text-xl mb-1.5">{skill.icon}</div>
+              <h3 className="text-accent font-semibold mb-1.5 text-xs sm:text-sm">{skill.category}</h3>
+              <p className="text-dimmed text-xs leading-relaxed">{skill.skills}</p>
             </div>
-          )): (
-            <div className="text-center p-3 sm:p-4 bg-bg/20 backdrop-blur-sm rounded-xl border border-accent/10 col-span-2 sm:col-span-3 lg:col-span-5">
-              <h3 className="text-accent font-semibold mb-2 text-xs sm:text-sm lg:text-base">Loading...</h3>
-            </div>
-          )
-          }
+          ))}
         </motion.div>
       </div>
+
+      {/* Scroll indicator */}
+      {isClient && (
+        <motion.div
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-dimmed"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.8 }}
+          aria-hidden="true"
+        >
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <ChevronDown size={24} className="text-accent/50" />
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   )
 }

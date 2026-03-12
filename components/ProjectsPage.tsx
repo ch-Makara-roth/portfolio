@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Star, Folder, ArrowLeft } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import { ProjectCard } from './ProjectCard'
 import { ProjectFilter } from './ProjectFilter'
 import { Project } from '@/app/api/projects/route'
@@ -17,28 +17,39 @@ export function ProjectsPage() {
     queryKey: ['projects'],
     queryFn: async () => {
       const response = await fetch('/api/projects')
-      if (!response.ok) {
-        throw new Error('Failed to fetch projects')
-      }
+      if (!response.ok) throw new Error('Failed to fetch projects')
       return response.json() as Promise<Project[]>
     },
   })
 
-  const featuredProjects = useMemo(() => filteredProjects.filter(project => project.featured), [filteredProjects])
-  const otherProjects = useMemo(() => filteredProjects.filter(project => !project.featured), [filteredProjects])
-  const spotlightProject = useMemo(() => featuredProjects[0], [featuredProjects])
-  const remainingFeatured = useMemo(() => featuredProjects.slice(1), [featuredProjects])
+  // First project gets the large featured treatment; rest go in the grid
+  const spotlightProject = useMemo(
+    () => filteredProjects.find(p => p.featured) ?? filteredProjects[0],
+    [filteredProjects]
+  )
+  const gridProjects = useMemo(
+    () => filteredProjects.filter(p => p !== spotlightProject),
+    [filteredProjects, spotlightProject]
+  )
+
+  // Stats
+  const totalTechs = useMemo(() => {
+    if (!projects) return 0
+    const set = new Set<string>()
+    projects.forEach(p => p.techStack.forEach(t => set.add(t)))
+    return set.size
+  }, [projects])
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg py-20 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full mx-auto mb-6 shadow-[0_0_20px_rgba(100,255,218,0.3)]"
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full"
           />
-          <p className="text-dimmed text-lg animate-pulse">Designing the future...</p>
+          <p className="text-dimmed text-sm font-mono">Loading projects...</p>
         </div>
       </div>
     )
@@ -46,15 +57,11 @@ export function ProjectsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-bg py-20 flex items-center justify-center">
-        <div className="text-center p-8 bg-red-500/5 rounded-3xl border border-red-500/20 backdrop-blur-xl max-w-md">
-          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-red-400 text-4xl">⚠</span>
-          </div>
-          <h2 className="text-2xl font-bold text-text mb-3">System Overload</h2>
-          <p className="text-dimmed mb-6">Failed to retrieve projects from the mainframe. Please re-initiate the connection.</p>
-          <Button onClick={() => window.location.reload()} className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border-red-500/30">
-            Retry Connection
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-dimmed">Failed to load projects.</p>
+          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+            <RefreshCw size={14} className="mr-2" /> Retry
           </Button>
         </div>
       </div>
@@ -62,152 +69,132 @@ export function ProjectsPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-bg overflow-hidden flex flex-col">
-      {/* Decorative Background Elements */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent/5 blur-[120px] rounded-full animate-pulse-slow" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 blur-[120px] rounded-full animate-pulse-slow" style={{ animationDelay: '1.5s' }} />
-        <div className="absolute top-[30%] right-[10%] w-[20%] h-[20%] bg-accent/3 blur-[80px] rounded-full" />
-      </div>
+    <div className="min-h-screen bg-bg">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-28 max-w-6xl">
 
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-28">
-        {/* Header Section */}
-        <header className="max-w-4xl mx-auto mb-16 md:mb-24">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="space-y-6"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-mono mb-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-              </span>
-              CURATED WORK
-            </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-text tracking-tighter leading-[0.9]">
-              IMAGINING <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-accent/80 to-secondary animate-gradient bg-[length:200%_auto]">POSSIBILITIES.</span>
-            </h1>
-            <p className="text-lg md:text-xl text-dimmed max-w-2xl leading-relaxed font-light">
-              Designing and building digital products with a focus on <span className="text-text font-medium">performance</span>, <span className="text-text font-medium">aesthetics</span>, and <span className="text-text font-medium">user experience</span>.
-            </p>
-          </motion.div>
-        </header>
-
-        {/* Filter Section */}
-        <motion.div
+        {/* ── Header ── */}
+        <motion.header
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-16 md:mb-24"
+          transition={{ duration: 0.6 }}
+          className="mb-14 md:mb-16"
         >
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-accent/20 to-secondary/20 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative bg-bg/40 backdrop-blur-2xl border border-dimmed/10 rounded-3xl p-4 sm:p-6">
-              <ProjectFilter
-                projects={projects || []}
-                onFilteredProjects={setFilteredProjects}
-                onViewModeChange={setViewMode}
-              />
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-px w-8 bg-accent" />
+                <span className="text-xs font-mono text-accent tracking-widest uppercase">Portfolio</span>
+              </div>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-text tracking-tight leading-none">
+                My Work.
+              </h1>
+              <p className="text-dimmed max-w-lg leading-relaxed text-base">
+                A curated collection of projects I've designed and built — focused on clean UX, performance, and shipping things that matter.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="flex items-center gap-8 shrink-0 border border-dimmed/10 rounded-2xl px-8 py-5 bg-bg/40">
+              <div className="text-center">
+                <p className="text-3xl font-black text-text tabular-nums">{projects?.length ?? 0}</p>
+                <p className="text-[10px] font-mono text-dimmed uppercase tracking-widest mt-1">Projects</p>
+              </div>
+              <div className="w-px h-10 bg-dimmed/10" />
+              <div className="text-center">
+                <p className="text-3xl font-black text-text tabular-nums">{totalTechs}</p>
+                <p className="text-[10px] font-mono text-dimmed uppercase tracking-widest mt-1">Technologies</p>
+              </div>
             </div>
           </div>
+        </motion.header>
+
+        {/* ── Filter ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="mb-10 pb-8 border-b border-dimmed/10"
+        >
+          <ProjectFilter
+            projects={projects || []}
+            onFilteredProjects={setFilteredProjects}
+            onViewModeChange={setViewMode}
+          />
         </motion.div>
 
-        {/* Projects Content */}
-        <div className="space-y-24 md:space-y-32">
-          {filteredProjects.length > 0 ? (
-            <>
-              {/* Spotlight Project */}
-              {viewMode === 'grid' && spotlightProject && (
-                <motion.section
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="relative"
-                >
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-dimmed/20 to-transparent" />
-                    <h2 className="text-xs font-mono text-accent tracking-[0.2em] uppercase">Spotlight</h2>
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-dimmed/20 to-transparent" />
-                  </div>
-
-                  <div className="group relative">
-                    <ProjectCard project={spotlightProject} viewMode="grid" className="md:aspect-video" isLarge />
-                  </div>
-                </motion.section>
-              )}
-
-              {/* Grid or List View */}
-              <motion.section
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
-                {viewMode === 'grid' && (
-                  <div className="flex items-center gap-3 mb-12">
-                    <h2 className="text-xs font-mono text-dimmed tracking-[0.2em] uppercase">Collections</h2>
-                    <div className="h-px flex-1 bg-gradient-to-r from-dimmed/20 to-transparent" />
-                  </div>
+        {/* ── Projects ── */}
+        {filteredProjects.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+          >
+            {viewMode === 'grid' ? (
+              <div className="space-y-6">
+                {/* Spotlight — large horizontal card */}
+                {spotlightProject && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <ProjectCard project={spotlightProject} viewMode="grid" isLarge />
+                  </motion.div>
                 )}
 
-                <div className={`${viewMode === 'grid'
-                  ? 'grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12'
-                  : 'space-y-8'
-                  }`}>
-                  {(viewMode === 'grid' ? [...remainingFeatured, ...otherProjects] : filteredProjects).map((project, index) => (
-                    <motion.div
-                      key={project.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-50px" }}
-                      transition={{ duration: 0.6, delay: index * 0.1 }}
-                    >
-                      <ProjectCard project={project} viewMode={viewMode} />
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.section>
-            </>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="py-32 text-center"
-            >
-              <div className="relative inline-block mb-8">
-                <div className="absolute -inset-4 bg-accent/20 blur-2xl rounded-full animate-pulse"></div>
-                <div className="relative text-6xl">🔭</div>
+                {/* Remaining projects in 2-col grid */}
+                {gridProjects.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {gridProjects.map((project, index) => (
+                      <motion.div
+                        key={project.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                      >
+                        <ProjectCard project={project} viewMode="grid" />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <h3 className="text-2xl font-bold text-text mb-2">No artifacts found</h3>
-              <p className="text-dimmed max-w-sm mx-auto">The search criteria didn't match any of my records. Try adjusting your parameters.</p>
-              <Button
-                variant="ghost"
-                className="mt-8 text-accent hover:bg-accent/10"
-                onClick={() => window.location.reload()}
-              >
-                Reset Exploration
-              </Button>
-            </motion.div>
-          )}
-        </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredProjects.map((project, index) => (
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.07 }}
+                  >
+                    <ProjectCard project={project} viewMode="list" />
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <div className="py-24 text-center space-y-3">
+            <p className="text-4xl">🔍</p>
+            <h3 className="text-xl font-semibold text-text">No projects found</h3>
+            <p className="text-dimmed text-sm">Try adjusting your search or filters.</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="mt-4 text-accent hover:bg-accent/10"
+              onClick={() => window.location.reload()}
+            >
+              Reset filters
+            </Button>
+          </div>
+        )}
 
-        {/* Footer Decoration */}
-        <div className="mt-32 pt-16 border-t border-dimmed/10 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-dimmed">
-          <div className="flex items-center gap-4">
-            <span className="font-mono text-accent">© 2024</span>
-            <span>Handcrafted with precision</span>
-          </div>
-          <div className="flex gap-8 font-mono">
-            <a href="#top" className="hover:text-accent transition-colors">TOP ↑</a>
-          </div>
-        </div>
       </div>
 
-      {/* Bottom Nav padding for mobile */}
+      {/* Mobile nav padding */}
       <div className="h-24 md:hidden" />
     </div>
   )
