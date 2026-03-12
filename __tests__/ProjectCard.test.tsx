@@ -105,7 +105,7 @@ describe('ProjectCard', () => {
   it('renders action buttons and links', () => {
     render(<ProjectCard project={mockProject} />)
 
-    expect(screen.getByText('EXPLORE CASE STUDY')).toBeInTheDocument()
+    expect(screen.getByText('VIEW CASE STUDY')).toBeInTheDocument()
     const links = screen.getAllByRole('link')
     expect(links.some(link => link.getAttribute('href') === mockProject.githubUrl)).toBe(true)
     expect(links.some(link => link.getAttribute('href') === mockProject.liveUrl)).toBe(true)
@@ -151,7 +151,8 @@ describe('ProjectCard', () => {
     const { container } = render(<ProjectCard project={mockProject} viewMode="list" />)
 
     const cardElement = container.firstChild as HTMLElement
-    expect(cardElement).toHaveClass('sm:flex-row')
+    expect(cardElement).toHaveClass('flex')
+    expect(cardElement).not.toHaveClass('sm:flex-row')
   })
 
   it('handles mouse hover events', () => {
