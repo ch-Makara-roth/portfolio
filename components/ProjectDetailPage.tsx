@@ -18,21 +18,14 @@ interface ProjectDetailPageProps {
 export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
   const router = useRouter()
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [previewMode, setPreviewMode] = useState<'image' | 'iframe'>(project.liveUrl ? 'iframe' : 'image')
+  // Default to image — iframe is opt-in since most sites block embedding via X-Frame-Options
+  const [previewMode, setPreviewMode] = useState<'image' | 'iframe'>('image')
 
   // Motion variants
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-  }
-
-  const stagger = {
-    animate: {
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
   }
 
   return (
@@ -247,7 +240,7 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
                 </motion.div>
 
                 {/* Features Bento */}
-                <motion.div {...fadeInUp} transition={{ delay: 0.2 }}>
+                <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.2 }}>
                   <h2 className="text-xs font-mono tracking-[0.3em] uppercase text-secondary mb-8 flex items-center gap-4">
                     03 <div className="h-px w-12 bg-secondary/30" /> FEATURES
                   </h2>
