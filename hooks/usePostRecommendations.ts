@@ -49,9 +49,9 @@ async function fetchRecommendations(currentPost: BlogPost, limit: number = 4): P
     if (currentPost.author.id === post.author.id) {
       score += 1
     }
-    
-    const currentDate = new Date(currentPost.publishedAt)
-    const postDate = new Date(post.publishedAt)
+
+    const currentDate = currentPost.publishedAt ? new Date(currentPost.publishedAt) : new Date()
+    const postDate = post.publishedAt ? new Date(post.publishedAt) : new Date()
     const daysDiff = Math.abs((currentDate.getTime() - postDate.getTime()) / (1000 * 60 * 60 * 24))
     if (daysDiff <= 30) {
       score += 0.5

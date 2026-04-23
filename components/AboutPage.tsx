@@ -83,14 +83,14 @@ export default function AboutPage() {
               <User size={14} className="text-secondary" />
               <span className="text-xs font-bold uppercase tracking-widest text-secondary">Get to know me</span>
             </div>
-            <h1 className="text-5xl sm:text-6xl md:text-8xl font-black mb-6 tracking-tighter">
+            <h2 className="text-5xl sm:text-6xl md:text-8xl font-black mb-6 tracking-tighter">
               Behind the <br />
               <span className="bg-gradient-to-r from-accent via-secondary to-accent bg-clip-text text-transparent bg-[length:200%_100%] animate-gradient">
                 code.
               </span>
-            </h1>
+            </h2>
             <p className="text-lg md:text-xl text-dimmed leading-relaxed">
-              Learn more about my journey, the skills I've gathered along the way, and my passion for crafting digital experiences.
+              Learn more about my journey, the skills I've gathered along the way, and my passion for crafting digital experiences. From my beginnings in Phnom Penh to becoming a full-stack developer specializing in modern web technologies, this page shares my professional background, technical expertise, educational journey, and the projects that define my work.
             </p>
           </motion.div>
         </div>

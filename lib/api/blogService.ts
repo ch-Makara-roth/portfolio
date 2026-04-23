@@ -9,7 +9,7 @@ import {
   BlogQueryParams 
 } from '@/types/blog'
 
-const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || ''
+const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'https://api.chhuonmakararoth.site/api/v1'
 
 export class ApiError extends Error {
   constructor(
@@ -85,7 +85,9 @@ class BlogApiService {
   }
 
   async getPost(slug: string, signal?: AbortSignal): Promise<SingleBlogPostResponse> {
-    return this.request<SingleBlogPostResponse>(`/blog/posts/${slug}`, {}, signal)
+    // Fetch post by slug directly from the API
+    // Endpoint: /blog/posts/{slug}
+    return this.request<SingleBlogPostResponse>(`/blog/posts/${encodeURIComponent(slug)}`, {}, signal)
   }
 
   async getRecommendedPosts(

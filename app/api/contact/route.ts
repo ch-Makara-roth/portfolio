@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 
 const CONTACT_API_URL = process.env.CONTACT_API_URL || 'http://localhost:3001/api/v1/contact'
+
+// Zod schema for contact form validation
+const contactSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100).trim(),
+  email: z.string().email('Invalid email address').max(255),
+  subject: z.string().min(1, 'Subject is required').max(200).trim(),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(5000).trim(),
+  phone: z.string().max(50).optional().or(z.literal('')),
+  company: z.string().max(200).optional().or(z.literal('')),
+  website: z.string().url('Invalid website URL').max(500).optional().or(z.literal('')),
+  budget: z.string().max(100).optional().or(z.literal('')),
+  timeline: z.string().max(100).optional().or(z.literal('')),
+  turnstileToken: z.string().min(1, 'Security verification is required'),
+})
 
 async function verifyTurnstileToken(token: string): Promise<boolean> {
   const secretKey = process.env.TURNSTILE_SECRET_KEY
@@ -45,6 +60,19 @@ interface ContactFormData {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+
+    // Validate input with Zod
+    const result = contactSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid input', 
+          details: result.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
+        },
+        { status: 400 }
+      )
+    }
+
     const {
       name,
       email,
@@ -56,23 +84,7 @@ export async function POST(request: NextRequest) {
       website,
       budget,
       timeline
-    } = body
-
-    // Validate required fields
-    if (!name || !email || !subject || !message || !turnstileToken) {
-      return NextResponse.json(
-        { error: 'Name, email, subject, message, and Turnstile token are required' },
-        { status: 400 }
-      )
-    }
-
-    // Validate Turnstile token
-    if (!turnstileToken) {
-      return NextResponse.json(
-        { error: 'Security verification is required' },
-        { status: 400 }
-      )
-    }
+    } = result.data
 
     const isValidToken = await verifyTurnstileToken(turnstileToken)
     if (!isValidToken) {
@@ -97,30 +109,47 @@ export async function POST(request: NextRequest) {
     if (budget) contactData.budget = budget
     if (timeline) contactData.timeline = timeline
 
-    // Forward to external API
-    const response = await fetch(CONTACT_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(contactData),
-    })
+    // Forward to external API with timeout
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
-    const result = await response.json()
+    try {
+      const response = await fetch(CONTACT_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactData),
+        signal: controller.signal,
+      })
 
-    if (!response.ok) {
-      console.error('External API error:', result)
-      return NextResponse.json(
-        { error: result.message || 'Failed to submit contact form' },
-        { status: response.status }
-      )
+      clearTimeout(timeout)
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        console.error('External API error:', response.status)
+        return NextResponse.json(
+          { error: 'Failed to submit contact form' },
+          { status: response.status }
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Message sent successfully!',
+        data: result
+      })
+    } catch (fetchError) {
+      clearTimeout(timeout)
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        return NextResponse.json(
+          { error: 'Request timeout. Please try again later.' },
+          { status: 504 }
+        )
+      }
+      throw fetchError
     }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Message sent successfully!',
-      data: result
-    })
   } catch (error) {
     console.error('Error submitting contact form:', error)
     return NextResponse.json(

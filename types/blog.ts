@@ -17,20 +17,24 @@ export interface BlogPost {
   tags: string[]
   imageUrl: string | null
   image?: string | null // For backward compatibility
-  readingTime: number
+  readingTime: number | null
   metaTitle: string | null
   metaDescription: string | null
-  publishedAt: string
+  publishedAt: string | null
   createdAt: string
   updatedAt: string
+  authorId: string
   author: Author
+  likes?: number
+  views?: number
+  comments?: any[]
+  likesAggregate?: {
+    likeCount: number
+  }
   _count: {
     comments: number
     likes?: number // For backward compatibility
   }
-  // Additional properties for backward compatibility
-  likes?: number
-  views?: number
 }
 
 export interface BlogPostsResponse {

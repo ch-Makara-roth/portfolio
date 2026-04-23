@@ -85,11 +85,11 @@ export function ProjectsPage() {
                 <div className="h-px w-8 bg-accent" />
                 <span className="text-xs font-mono text-accent tracking-widest uppercase">Portfolio</span>
               </div>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-text tracking-tight leading-none">
+              <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-text tracking-tight leading-none">
                 My Work.
-              </h1>
+              </h2>
               <p className="text-dimmed max-w-lg leading-relaxed text-base">
-                A curated collection of projects I've designed and built — focused on clean UX, performance, and shipping things that matter.
+                A curated collection of projects I've designed and built — focused on clean UX, performance, and shipping things that matter. Explore my work spanning full-stack web applications, mobile apps, API integrations, and modern web technologies including React, Next.js, TypeScript, and more.
               </p>
             </div>
 

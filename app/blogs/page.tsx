@@ -10,8 +10,12 @@ export const metadata: Metadata = generateMetadata({
 
 export default function Page() {
   return (
-    <div className="container mx-auto p-4 sm:pb-20 md:pb-32">
-      <BlogsPage />
-    </div>
+    <>
+      {/* Server-rendered H1 for SEO */}
+      <h1 className="sr-only">Blog - Web Development Articles by Chhuon Makara Roth</h1>
+      <div className="container mx-auto p-4 sm:pb-20 md:pb-32">
+        <BlogsPage />
+      </div>
+    </>
   );
 }

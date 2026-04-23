@@ -803,10 +803,15 @@ export const BlogPost = ({ post }: BlogPostProps) => {
   const isHostAllowed = (src: string) => {
     if (!src) return false
     if (src.startsWith('/')) return true
+    // Block data URIs for security
+    if (src.startsWith('data:')) return false
     try {
       const url = new URL(src)
+      // Only allow HTTPS protocol for security
+      if (url.protocol !== 'https:') return false
       return allowedHosts.has(url.hostname)
     } catch {
-      return true
+      // Invalid URL = block for security
+      return false
     }
   }
