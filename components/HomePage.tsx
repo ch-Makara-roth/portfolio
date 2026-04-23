@@ -55,17 +55,19 @@ export default function HomePage() {
           </span>
         </motion.div>
 
-        {/* Name */}
+        {/* Name - H1 for SEO */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <ShinyText
-            text="Chhuon Makara Roth"
-            speed={2.5}
-            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold mb-4 sm:mb-5 px-2 leading-tight"
-          />
+          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold mb-4 sm:mb-5 px-2 leading-tight">
+            <ShinyText
+              text="Chhuon Makara Roth"
+              speed={2.5}
+              className="inline"
+            />
+          </h1>
         </motion.div>
 
         {/* Role badge */}
@@ -89,6 +91,8 @@ export default function HomePage() {
         >
           I craft modern web experiences using cutting-edge technologies.
           Specializing in React, Next.js, and full-stack development.
+          Based in Phnom Penh, Cambodia, I build scalable applications
+          that solve real-world problems with clean, maintainable code.
         </motion.p>
 
         {/* CTA Buttons */}

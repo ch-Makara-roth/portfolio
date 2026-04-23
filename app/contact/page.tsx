@@ -9,5 +9,11 @@ export const metadata: Metadata = generateMetadata({
 })
 
 export default function Contact() {
-  return <ContactPage />
+  return (
+    <>
+      {/* Server-rendered H1 for SEO */}
+      <h1 className="sr-only">Contact Chhuon Makara Roth - Full Stack Developer</h1>
+      <ContactPage />
+    </>
+  )
 } 

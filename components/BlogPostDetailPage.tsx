@@ -10,6 +10,7 @@ import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { PostRecommendations } from './PostRecommendations'
+import { TableOfContents } from './TableOfContents'
 import { useState, useEffect, useRef } from 'react'
 import { usePost, useComments, useCreateComment } from '@/hooks/useBlogQueries'
 import blogApiService from '@/lib/api/blogService'
@@ -55,8 +56,9 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
 
   useEffect(() => {
     if (post) {
-      const initial = (post._count?.likes ?? post.likes ?? 0) as number
-      setLikesCount(initial)
+      // Get likes from likesAggregate or fallback to likes field
+      const likeCount = post.likesAggregate?.likeCount ?? post.likes ?? 0
+      setLikesCount(likeCount as number)
     }
   }, [post])
 
@@ -242,12 +244,18 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-accent"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-dimmed text-sm">Loading article...</p>
+        </div>
       </div>
     )
   }
 
   if (error || !post) {
+    console.error('Blog post error:', error)
+    console.log('Post data:', post)
+    
     return (
       <div className="min-h-screen py-8 max-sm:pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 sm:py-12 md:py-16">
         <div className="max-w-4xl mx-auto">
@@ -258,8 +266,23 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
             className="mb-12"
           >
             <div className="text-center py-16">
-              <h2 className="text-2xl font-semibold text-text mb-2">Post not found</h2>
-              <p className="text-dimmed">The requested article could not be loaded.</p>
+              <h2 className="text-2xl font-semibold text-text mb-2">
+                {error ? 'Failed to load article' : 'Post not found'}
+              </h2>
+              <p className="text-dimmed mb-4">
+                {error instanceof Error 
+                  ? error.message 
+                  : 'The requested article could not be loaded.'}
+              </p>
+              <p className="text-dimmed text-sm mb-6">
+                Slug: {slug}
+              </p>
+              <Link href="/blogs">
+                <Button variant="outline">
+                  <ArrowLeft size={16} className="mr-2" />
+                  Back to Blogs
+                </Button>
+              </Link>
             </div>
           </motion.article>
         </div>
@@ -296,7 +319,7 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent leading-tight">
               {post.title}
             </h1>
-            
+
             {/* Author and Meta Info */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-dimmed mb-6">
               <div className="flex items-center space-x-3">
@@ -312,19 +335,19 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
                   <p className="text-sm text-dimmed">Author</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <Calendar size={16} />
-                  <span>{new Date(post.createdAt).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  <span>{new Date(post.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                   })}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock size={16} />
-                  <span>5 min read</span>
+                  <span>{post.readingTime ? `${post.readingTime} min read` : '5 min read'}</span>
                 </div>
               </div>
             </div>
@@ -345,7 +368,7 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
               </div>
             </div>
           </div>
-        
+
         </motion.header>
 
         {/* Article Content */}
@@ -355,11 +378,14 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-12"
         >
-          <MarkdownRenderer 
-            content={post.content} 
+          <MarkdownRenderer
+            content={post.content}
             className="prose-headings:scroll-mt-20"
           />
         </motion.article>
+
+        {/* Table of Contents - Fixed Right Side */}
+        <TableOfContents content={post.content} />
 
         {/* Article Footer */}
         <motion.footer

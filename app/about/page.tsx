@@ -9,5 +9,11 @@ export const metadata: Metadata = generateMetadata({
 })
 
 export default function About() {
-  return <AboutPage />
+  return (
+    <>
+      {/* Server-rendered H1 for SEO */}
+      <h1 className="sr-only">About Chhuon Makara Roth - Full Stack Developer</h1>
+      <AboutPage />
+    </>
+  )
 } 

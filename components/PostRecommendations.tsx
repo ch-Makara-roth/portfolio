@@ -21,7 +21,8 @@ interface RecommendationCardProps {
 }
 
 const RecommendationCard = ({ post, index }: RecommendationCardProps) => {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Unknown date'
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -54,13 +55,13 @@ const RecommendationCard = ({ post, index }: RecommendationCardProps) => {
             <div className="flex items-center gap-3 text-xs text-dimmed flex-shrink-0">
               <div className="flex items-center gap-1">
                 <Calendar size={12} />
-                <time dateTime={post.publishedAt}>
+                <time dateTime={post.publishedAt || undefined}>
                   {formatDate(post.publishedAt)}
                 </time>
               </div>
               <div className="flex items-center gap-1">
                 <Clock size={12} />
-                <span>{post.readingTime} min read</span>
+                <span>{post.readingTime || 5} min read</span>
               </div>
             </div>
             

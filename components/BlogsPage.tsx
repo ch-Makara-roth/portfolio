@@ -210,11 +210,11 @@ const BlogsPage = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <motion.div
-                animate={{ 
+                animate={{
                   rotate: [0, 360],
                   scale: [1, 1.1, 1]
                 }}
-                transition={{ 
+                transition={{
                   duration: 2,
                   repeat: Infinity,
                   repeatDelay: 3
@@ -222,7 +222,7 @@ const BlogsPage = () => {
               >
                 <Sparkles className="h-5 w-5 text-blue-400" />
               </motion.div>
-              <h1 className="text-xl font-bold">Latest Posts</h1>
+              <h2 className="text-xl font-bold">Latest Posts</h2>
             </div>
             
             <div className="flex items-center space-x-2">

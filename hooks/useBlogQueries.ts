@@ -42,13 +42,17 @@ export function usePost(id: string) {
   return useQuery({
     queryKey: QUERY_KEYS.post(id),
     queryFn: async () => {
+      console.log('Fetching post with slug:', id)
       const response = await blogService.getPost(id)
+      console.log('Post API response:', response)
       return response.data
     },
     enabled: !!id,
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchInterval: 15000,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }
 
