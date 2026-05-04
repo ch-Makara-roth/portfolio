@@ -132,19 +132,19 @@ export default function HomePage() {
           transition={{ delay: 0.9, duration: 0.8 }}
         >
           <a
-            href="https://github.com"
+            href="https://github.com/ch-Makara-roth"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="GitHub"
+            aria-label="Chhuon Makara Roth on GitHub"
             className="p-2 rounded-full text-dimmed hover:text-accent border border-transparent hover:border-accent/30 hover:bg-accent/5 transition-all duration-200"
           >
             <Github size={20} />
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/chhuon-makararoth-b66700262/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="LinkedIn"
+            aria-label="Chhuon Makara Roth on LinkedIn"
             className="p-2 rounded-full text-dimmed hover:text-accent border border-transparent hover:border-accent/30 hover:bg-accent/5 transition-all duration-200"
           >
             <Linkedin size={20} />

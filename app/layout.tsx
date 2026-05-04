@@ -28,6 +28,7 @@ export default function RootLayout({
 }) {
   const personStructuredData = generateStructuredData("person", {});
   const websiteStructuredData = generateStructuredData("website", {});
+  const siteNavigationStructuredData = generateStructuredData("siteNavigation", {});
 
   return (
     <html lang="en" className="dark">
@@ -42,6 +43,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(websiteStructuredData),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(siteNavigationStructuredData),
           }}
         />
         <link rel="icon" href="/favicon.ico" sizes="32x32" />

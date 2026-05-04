@@ -28,10 +28,17 @@ export function DockNavigation() {
       <div className="flex items-end justify-center gap-1 sm:gap-2 md:gap-3 px-3 sm:px-4 md:px-6 py-2 sm:py-3 bg-bg/95 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-dimmed/20 shadow-lg mx-auto max-w-fit">
         {navItems.map((item) => {
           const Icon = item.icon
-          const isActive = pathname === item.href
+          const normalizedPathname = pathname.endsWith('/') ? pathname : `${pathname}/`
+          const isActive = normalizedPathname === item.href
           
           return (
-            <Link key={item.href} href={item.href} className="relative group">
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-label={item.label}
+              title={item.label}
+              className="relative group"
+            >
               <motion.div
                 className={`dock-item relative p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl transition-all duration-200 min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px] md:min-w-[52px] md:min-h-[52px] flex items-center justify-center ${
                   isActive 

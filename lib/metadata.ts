@@ -1,12 +1,41 @@
 import { Metadata } from 'next'
 
 export const baseMetadata = {
+  name: 'Chhuon Makara Roth',
   title: 'Chhuon Makara Roth - Full Stack Developer',
   description: 'Portfolio of Makara, a full-stack developer specializing in modern web technologies including React, Next.js, TypeScript, and Node.js.',
   keywords: 'Makara, Chhuon Makara Roth, full-stack developer, React, Next.js, TypeScript, Node.js, web development, Cambodia developer, portfolio',
   author: 'Chhuon Makara Roth',
   siteUrl: 'https://www.chhuonmakararoth.site',
 }
+
+export const siteNavigationItems = [
+  {
+    name: 'Projects',
+    url: `${baseMetadata.siteUrl}/projects/`,
+    description: 'Full-stack web development projects by Chhuon Makara Roth.',
+  },
+  {
+    name: 'About',
+    url: `${baseMetadata.siteUrl}/about/`,
+    description: 'Professional background, skills, education, and experience.',
+  },
+  {
+    name: 'Services',
+    url: `${baseMetadata.siteUrl}/services/`,
+    description: 'Web development, mobile development, API, UI/UX, and consulting services.',
+  },
+  {
+    name: 'Contact',
+    url: `${baseMetadata.siteUrl}/contact/`,
+    description: 'Contact Chhuon Makara Roth for projects and collaboration.',
+  },
+  {
+    name: 'Blogs',
+    url: `${baseMetadata.siteUrl}/blogs/`,
+    description: 'Articles and insights about web development and technology.',
+  },
+]
 
 export function generateMetadata({
   title,
@@ -30,6 +59,7 @@ export function generateMetadata({
   return {
     title: fullTitle,
     description: fullDescription,
+    applicationName: baseMetadata.name,
     keywords: baseMetadata.keywords,
     authors: [{ name: baseMetadata.author }],
     creator: baseMetadata.author,
@@ -43,7 +73,7 @@ export function generateMetadata({
       title: fullTitle,
       description: fullDescription,
       url: fullUrl,
-      siteName: baseMetadata.title,
+      siteName: baseMetadata.name,
       images: [
         {
           url: image,
@@ -101,7 +131,7 @@ export function generateMetadata({
   }
 }
 
-export function generateStructuredData(type: 'person' | 'website' | 'article' | 'breadcrumb' | 'webpage', data: any) {
+export function generateStructuredData(type: 'person' | 'website' | 'siteNavigation' | 'article' | 'breadcrumb' | 'webpage', data: any) {
   const baseStructuredData = {
     '@context': 'https://schema.org',
   }
@@ -111,10 +141,14 @@ export function generateStructuredData(type: 'person' | 'website' | 'article' | 
       return {
         ...baseStructuredData,
         '@type': 'Person',
+        '@id': `${baseMetadata.siteUrl}/#person`,
         name: 'Chhuon Makara Roth',
+        alternateName: ['Makara Roth', 'Chhuon MakaraRoth'],
         jobTitle: 'Full Stack Developer',
         description: 'Full-stack developer specializing in modern web technologies',
         url: baseMetadata.siteUrl,
+        image: `${baseMetadata.siteUrl}/avatars/roth.jpg`,
+        mainEntityOfPage: `${baseMetadata.siteUrl}/`,
         sameAs: [
           'https://github.com/ch-Makara-roth',
           'https://www.linkedin.com/in/chhuon-makararoth-b66700262/',
@@ -135,14 +169,31 @@ export function generateStructuredData(type: 'person' | 'website' | 'article' | 
       return {
         ...baseStructuredData,
         '@type': 'WebSite',
-        name: baseMetadata.title,
+        '@id': `${baseMetadata.siteUrl}/#website`,
+        name: baseMetadata.name,
+        alternateName: baseMetadata.title,
         url: baseMetadata.siteUrl,
         description: baseMetadata.description,
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: `${baseMetadata.siteUrl}/search?q={search_term_string}`,
-          'query-input': 'required name=search_term_string',
+        inLanguage: 'en',
+        publisher: {
+          '@id': `${baseMetadata.siteUrl}/#person`,
         },
+        ...data,
+      }
+
+    case 'siteNavigation':
+      return {
+        ...baseStructuredData,
+        '@type': 'ItemList',
+        '@id': `${baseMetadata.siteUrl}/#site-navigation`,
+        name: 'Main navigation',
+        itemListElement: siteNavigationItems.map((item, index) => ({
+          '@type': 'SiteNavigationElement',
+          position: index + 1,
+          name: item.name,
+          description: item.description,
+          url: item.url,
+        })),
         ...data,
       }
 
