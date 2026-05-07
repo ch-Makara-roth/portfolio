@@ -11,7 +11,7 @@ import { Github, Linkedin, Mail, Phone, MapPin, Send, Sparkles, CheckCircle2, Al
 import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile'
 
 const EMAIL_ADDRESS = 'chhuonmakara@gmail.com'
-const EMAIL_DISPLAY = 'chhuonmakara@gmail.com'
+const EMAIL_DISPLAY = EMAIL_ADDRESS
 const EMAIL_ACTION = `mailto:${EMAIL_ADDRESS}`
 
 const contactSchema = z.object({

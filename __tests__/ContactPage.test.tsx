@@ -44,13 +44,13 @@ describe('ContactPage', () => {
     expect(screen.getByRole('button', { name: /send message/i })).toBeInTheDocument()
   })
 
-  it('does not expose crawlable mailto links in the contact UI', () => {
+  it('shows the email address without rendering crawlable mailto links', () => {
     render(<ContactPage />)
 
     expect(screen.getAllByRole('button', { name: /send an email to/i })).toHaveLength(2)
     expect(screen.queryByRole('link', { name: /send an email to/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /chhuonmakara@gmail.com/i })).not.toBeInTheDocument()
-    expect(screen.getByText('chhuonmakara [at] gmail [dot] com')).toBeInTheDocument()
+    expect(screen.getByText('chhuonmakara@gmail.com')).toBeInTheDocument()
   })
 
   it('displays validation errors for empty required fields', async () => {
