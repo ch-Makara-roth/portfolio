@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Project } from '@/app/api/projects/route'
+import { generateMetadata as generateSeoMetadata } from '@/lib/metadata'
 import ProjectDetailPage from '../../../components/ProjectDetailPage'
 
 interface ProjectPageProps {
@@ -87,40 +88,25 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     const project = projects.find((p: Project) => p.id === params.slug)
 
     if (!project) {
-      return {
+      return generateSeoMetadata({
         title: 'Project Not Found',
-        description: 'The requested project could not be found.'
-      }
+        description: 'The requested project could not be found.',
+        path: `/projects/${params.slug}`,
+      })
     }
 
-    return {
-      title: `${project.title} | Portfolio`,
+    return generateSeoMetadata({
+      title: project.title,
       description: project.description,
-      openGraph: {
-        title: project.title,
-        description: project.description,
-        images: [
-          {
-            url: project.image,
-            width: 1200,
-            height: 630,
-            alt: project.title,
-          },
-        ],
-        type: 'website',
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: project.title,
-        description: project.description,
-        images: [project.image],
-      },
-    }
+      path: `/projects/${project.id}`,
+      image: project.image,
+    })
   } catch (error) {
-    return {
+    return generateSeoMetadata({
       title: 'Project Not Found',
-      description: 'The requested project could not be found.'
-    }
+      description: 'The requested project could not be found.',
+      path: `/projects/${params.slug}`,
+    })
   }
 }
 
