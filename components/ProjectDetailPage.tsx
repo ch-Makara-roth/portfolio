@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Github, ExternalLink, Calendar, Star, Code, Eye, Users, Clock, Tag } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Calendar, Star, Code, Eye, Users, Clock, Tag } from 'lucide-react'
+import { Github } from '@/components/icons/brand-icons'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -20,12 +21,13 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
   // Default to image — iframe is opt-in since most sites block embedding via X-Frame-Options
   const [previewMode, setPreviewMode] = useState<'image' | 'iframe'>('image')
+  const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
   // Motion variants
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+    transition: { duration: 0.8, ease: smoothEase }
   }
 
   return (
@@ -68,7 +70,7 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1, ease: smoothEase }}
                 className="space-y-10"
               >
                 <div className="space-y-6">
@@ -133,7 +135,7 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1.2, ease: smoothEase }}
                 className="relative w-full aspect-[4/5] sm:aspect-[4/3] lg:aspect-auto lg:h-[650px] rounded-[2rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-dimmed/10 flex flex-col bg-bg/40 backdrop-blur-xl group"
               >
                 {/* Browser Header Bar */}

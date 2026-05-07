@@ -152,16 +152,20 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
             <hr className="border-0 h-px bg-gradient-to-r from-transparent via-dimmed/30 to-transparent my-8" />
           ),
           // Custom image styles
-          img: ({ src, alt }) => (
-            <Image
-              src={src || ''}
-              alt={alt || ''}
-              width={800}
-              height={400}
-              className="rounded-lg border border-dimmed/20 max-w-full h-auto my-6 shadow-lg"
-              style={{ width: 'auto', height: 'auto' }}
-            />
-          ),
+          img: ({ src, alt }) => {
+            const imageSrc = typeof src === 'string' ? src : ''
+
+            return (
+              <Image
+                src={imageSrc}
+                alt={alt || ''}
+                width={800}
+                height={400}
+                className="rounded-lg border border-dimmed/20 max-w-full h-auto my-6 shadow-lg"
+                style={{ width: 'auto', height: 'auto' }}
+              />
+            )
+          },
         }}
       >
         {content}

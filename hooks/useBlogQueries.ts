@@ -193,7 +193,7 @@ export function useBookmarkPost() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: blogService.bookmarkPost,
+    mutationFn: (postId: string) => blogService.bookmarkPost(postId),
     onMutate: async (postId: string) => {
       await queryClient.cancelQueries({ queryKey: QUERY_KEYS.post(postId) })
       
@@ -229,7 +229,7 @@ export function useUnbookmarkPost() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: blogService.unbookmarkPost,
+    mutationFn: (postId: string) => blogService.unbookmarkPost(postId),
     onMutate: async (postId: string) => {
       await queryClient.cancelQueries({ queryKey: QUERY_KEYS.post(postId) })
       
