@@ -12,8 +12,8 @@ const SKILLS = [
   { category: 'Frontend', icon: '⚡', skills: 'React, Next.js, Vue, TypeScript' },
   { category: 'Backend',  icon: '🛠️', skills: 'Node.js, Laravel, PostgreSQL' },
   { category: 'Design',   icon: '🎨', skills: 'Figma, Tailwind CSS, Framer Motion' },
-  { category: 'DevOps',   icon: '🚀', skills: 'Docker, AWS, CI/CD, Git' },
-  { category: 'Mobile',   icon: '📱', skills: 'React Native, Flutter, iOS' },
+  { category: 'DevOps',   icon: '🚀', skills: 'Docker, CI/CD, GitHub' },
+  { category: 'Mobile',   icon: '📱', skills: 'React Native,' },
 ]
 
 export default function HomePage() {
