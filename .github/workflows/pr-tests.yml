@@ -38,13 +38,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock', '**/bun.lockb') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
       - name: Install dependencies
         run: |
-          if [ -f "bun.lockb" ]; then
+          if [ -f "bun.lock" ] || [ -f "bun.lockb" ]; then
             bun install
           else
             npm ci
@@ -52,7 +52,7 @@ jobs:
 
       - name: Run linting
         run: |
-          if [ -f "bun.lockb" ]; then
+          if [ -f "bun.lock" ] || [ -f "bun.lockb" ]; then
             bun run lint
           else
             npm run lint
@@ -60,7 +60,7 @@ jobs:
 
       - name: Type check
         run: |
-          if [ -f "bun.lockb" ]; then
+          if [ -f "bun.lock" ] || [ -f "bun.lockb" ]; then
             bun run type-check || npx tsc --noEmit
           else
             npm run type-check || npx tsc --noEmit
@@ -68,7 +68,7 @@ jobs:
 
       - name: Run tests
         run: |
-          if [ -f "bun.lockb" ]; then
+          if [ -f "bun.lock" ] || [ -f "bun.lockb" ]; then
             bun run test
           else
             npm run test
@@ -76,7 +76,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          if [ -f "bun.lockb" ]; then
+          if [ -f "bun.lock" ] || [ -f "bun.lockb" ]; then
             bun run test:coverage
           else
             npm run test:coverage
@@ -92,7 +92,7 @@ jobs:
 
       - name: Build application (test build)
         run: |
-          if [ -f "bun.lockb" ]; then
+          if [ -f "bun.lock" ] || [ -f "bun.lockb" ]; then
             bun run build
           else
             npm run build
@@ -111,8 +111,8 @@ jobs:
               issue_number: context.issue.number,
             });
 
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && 
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
               comment.body.includes('🧪 Test Results')
             );
 
@@ -125,7 +125,7 @@ jobs:
 
             ### Test Summary:
             - ✅ Linting
-            - ✅ Type checking  
+            - ✅ Type checking
             - ✅ Unit tests
             - ✅ Test coverage
             - ✅ Build verification
