@@ -1,60 +1,66 @@
-import { Metadata } from 'next'
+import { Metadata } from "next";
 
 export const baseMetadata = {
-  name: 'Chhuon Makara Roth',
-  title: 'Chhuon Makara Roth - Full Stack Developer',
-  description: 'Portfolio of Makara, a full-stack developer specializing in modern web technologies including React, Next.js, TypeScript, and Node.js.',
-  keywords: 'Makara, Chhuon Makara Roth, full-stack developer, React, Next.js, TypeScript, Node.js, web development, Cambodia developer, portfolio',
-  author: 'Chhuon Makara Roth',
-  siteUrl: 'https://www.chhuonmakararoth.site',
-}
+  name: "Chhuon Makara Roth",
+  title: "Chhuon Makara Roth - Full Stack Developer",
+  description:
+    "Portfolio of Makara, a full-stack developer specializing in modern web technologies including React, Next.js, TypeScript, and Node.js.",
+  keywords:
+    "Makara, Chhuon Makara Roth, full-stack developer, React, Next.js, TypeScript, Node.js, web development, Cambodia developer, portfolio",
+  author: "Chhuon Makara Roth",
+  siteUrl: "https://www.chhuonmakararoth.site",
+};
 
 export const siteNavigationItems = [
   {
-    name: 'Projects',
+    name: "Projects",
     url: `${baseMetadata.siteUrl}/projects/`,
-    description: 'Full-stack web development projects by Chhuon Makara Roth.',
+    description: "Full-stack web development projects by Chhuon Makara Roth.",
   },
   {
-    name: 'About',
+    name: "About",
     url: `${baseMetadata.siteUrl}/about/`,
-    description: 'Professional background, skills, education, and experience.',
+    description: "Professional background, skills, education, and experience.",
   },
   {
-    name: 'Services',
+    name: "Services",
     url: `${baseMetadata.siteUrl}/services/`,
-    description: 'Web development, mobile development, API, UI/UX, and consulting services.',
+    description:
+      "Web development, mobile development, API, UI/UX, and consulting services.",
   },
   {
-    name: 'Contact',
+    name: "Contact",
     url: `${baseMetadata.siteUrl}/contact/`,
-    description: 'Contact Chhuon Makara Roth for projects and collaboration.',
+    description: "Contact Chhuon Makara Roth for projects and collaboration.",
   },
   {
-    name: 'Blogs',
+    name: "Blogs",
     url: `${baseMetadata.siteUrl}/blogs/`,
-    description: 'Articles and insights about web development and technology.',
+    description: "Articles and insights about web development and technology.",
   },
-]
+];
 
 export function generateMetadata({
   title,
   description,
-  path = '',
-  image = '/og-image.jpg',
-  type = 'website',
+  path = "",
+  image = "/og-image.jpg",
+  type = "website",
 }: {
-  title?: string
-  description?: string
-  path?: string
-  image?: string
-  type?: 'website' | 'article'
-}): Metadata {
-  const fullTitle = title ? `${title} | ${baseMetadata.title}` : baseMetadata.title
-  const fullDescription = description || baseMetadata.description
+  title?: string;
+  description?: string;
+  path?: string;
+  image?: string;
+  type?: "website" | "article";
+} = {}): Metadata {
+  const fullTitle = title
+    ? `${title} | ${baseMetadata.title}`
+    : baseMetadata.title;
+  const fullDescription = description || baseMetadata.description;
   // Ensure consistent trailing slash handling
-  const normalizedPath = path === '' ? '/' : path.endsWith('/') ? path : `${path}/`
-  const fullUrl = `${baseMetadata.siteUrl}${normalizedPath}`
+  const normalizedPath =
+    path === "" ? "/" : path.endsWith("/") ? path : `${path}/`;
+  const fullUrl = `${baseMetadata.siteUrl}${normalizedPath}`;
 
   return {
     title: fullTitle,
@@ -82,13 +88,13 @@ export function generateMetadata({
           alt: fullTitle,
         },
       ],
-      locale: 'en_US',
+      locale: "en_US",
       type: type,
     },
 
     // Twitter
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: fullTitle,
       description: fullDescription,
       images: [image],
@@ -101,9 +107,9 @@ export function generateMetadata({
       googleBot: {
         index: true,
         follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
     },
 
@@ -115,131 +121,142 @@ export function generateMetadata({
     // App-specific
     appleWebApp: {
       capable: true,
-      statusBarStyle: 'black-translucent',
+      statusBarStyle: "black-translucent",
     },
 
     // Verification
     verification: {
-      google: 'E2xuGpkJrX7W9CRPK1KB7_Dnkbu2XFdAFBg_ZPB3u2k',
+      google: "E2xuGpkJrX7W9CRPK1KB7_Dnkbu2XFdAFBg_ZPB3u2k",
       other: {
-        'ahrefs-site-verification': 'f43fe6af70c9d1572d89e0196a750c104ea2d87416d7ec4a5c88fbdb4f4667de',
+        "ahrefs-site-verification":
+          "f43fe6af70c9d1572d89e0196a750c104ea2d87416d7ec4a5c88fbdb4f4667de",
       },
     },
 
     // Additional metadata
-    category: 'Technology',
-  }
+    category: "Technology",
+  };
 }
 
-export function generateStructuredData(type: 'person' | 'website' | 'siteNavigation' | 'article' | 'breadcrumb' | 'webpage', data: any) {
+export function generateStructuredData(
+  type:
+    | "person"
+    | "website"
+    | "siteNavigation"
+    | "article"
+    | "breadcrumb"
+    | "webpage",
+  data: any,
+) {
   const baseStructuredData = {
-    '@context': 'https://schema.org',
-  }
+    "@context": "https://schema.org",
+  };
 
   switch (type) {
-    case 'person':
+    case "person":
       return {
         ...baseStructuredData,
-        '@type': 'Person',
-        '@id': `${baseMetadata.siteUrl}/#person`,
-        name: 'Chhuon Makara Roth',
-        alternateName: ['Makara Roth', 'Chhuon MakaraRoth'],
-        jobTitle: 'Full Stack Developer',
-        description: 'Full-stack developer specializing in modern web technologies',
+        "@type": "Person",
+        "@id": `${baseMetadata.siteUrl}/#person`,
+        name: "Chhuon Makara Roth",
+        alternateName: ["Makara Roth", "Chhuon MakaraRoth"],
+        jobTitle: "Full Stack Developer",
+        description:
+          "Full-stack developer specializing in modern web technologies",
         url: baseMetadata.siteUrl,
         image: `${baseMetadata.siteUrl}/avatars/roth.jpg`,
         mainEntityOfPage: `${baseMetadata.siteUrl}/`,
         sameAs: [
-          'https://github.com/ch-Makara-roth',
-          'https://www.linkedin.com/in/chhuon-makararoth-b66700262/',
+          "https://github.com/ch-Makara-roth",
+          "https://www.linkedin.com/in/chhuon-makararoth-b66700262/",
         ],
         knowsAbout: [
-          'JavaScript',
-          'React',
-          'Next.js',
-          'TypeScript',
-          'Node.js',
-          'Web Development',
-          'Full Stack Development',
+          "JavaScript",
+          "React",
+          "Next.js",
+          "TypeScript",
+          "Node.js",
+          "Web Development",
+          "Full Stack Development",
         ],
         ...data,
-      }
+      };
 
-    case 'website':
+    case "website":
       return {
         ...baseStructuredData,
-        '@type': 'WebSite',
-        '@id': `${baseMetadata.siteUrl}/#website`,
+        "@type": "WebSite",
+        "@id": `${baseMetadata.siteUrl}/#website`,
         name: baseMetadata.name,
         alternateName: baseMetadata.title,
         url: baseMetadata.siteUrl,
         description: baseMetadata.description,
-        inLanguage: 'en',
+        inLanguage: "en",
         publisher: {
-          '@id': `${baseMetadata.siteUrl}/#person`,
+          "@id": `${baseMetadata.siteUrl}/#person`,
         },
         ...data,
-      }
+      };
 
-    case 'siteNavigation':
+    case "siteNavigation":
       return {
         ...baseStructuredData,
-        '@type': 'ItemList',
-        '@id': `${baseMetadata.siteUrl}/#site-navigation`,
-        name: 'Main navigation',
+        "@type": "ItemList",
+        "@id": `${baseMetadata.siteUrl}/#site-navigation`,
+        name: "Main navigation",
         itemListElement: siteNavigationItems.map((item, index) => ({
-          '@type': 'SiteNavigationElement',
+          "@type": "SiteNavigationElement",
           position: index + 1,
           name: item.name,
           description: item.description,
           url: item.url,
         })),
         ...data,
-      }
+      };
 
-    case 'article':
+    case "article":
       return {
         ...baseStructuredData,
-        '@type': 'Article',
+        "@type": "Article",
         headline: data.title,
         description: data.description,
         author: {
-          '@type': 'Person',
+          "@type": "Person",
           name: baseMetadata.author,
         },
         publisher: {
-          '@type': 'Person',
+          "@type": "Person",
           name: baseMetadata.author,
         },
         datePublished: data.datePublished,
         dateModified: data.dateModified,
         ...data,
-      }
+      };
 
-    case 'breadcrumb':
+    case "breadcrumb":
       return {
         ...baseStructuredData,
-        '@type': 'BreadcrumbList',
+        "@type": "BreadcrumbList",
         itemListElement: data.items.map((item: any, index: number) => ({
-          '@type': 'ListItem',
+          "@type": "ListItem",
           position: index + 1,
           name: item.name,
           item: item.item,
         })),
         ...data,
-      }
+      };
 
-    case 'webpage':
+    case "webpage":
       return {
         ...baseStructuredData,
-        '@type': 'WebPage',
+        "@type": "WebPage",
         name: data.name,
         description: data.description,
         url: data.url,
         ...data,
-      }
+      };
 
     default:
-      return baseStructuredData
+      return baseStructuredData;
   }
 }

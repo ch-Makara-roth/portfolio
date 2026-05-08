@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import ShinyText from '@/components/animations/ShinyText/ShinyText';
 import StarryBackground from '@/components/animations/StarryBackground';
 import Link from 'next/link'
-import { ArrowRight, Mail, Github, Linkedin, ChevronDown } from 'lucide-react'
+import { ArrowRight, Mail, ChevronDown } from 'lucide-react'
+import { GithubIcon as Github, LinkedinIcon as Linkedin } from '@/components/icons/BrandIcons'
 import { useState, useEffect } from 'react';
 
 const SKILLS = [

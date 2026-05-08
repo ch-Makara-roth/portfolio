@@ -1,39 +1,53 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowLeft, Github, ExternalLink, Calendar, Star, Code, Eye, Users, Clock, Tag } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { Project } from '@/app/api/projects/route'
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  ExternalLink,
+  Calendar,
+  Star,
+  Code,
+  Eye,
+  Users,
+  Clock,
+  Tag,
+} from "lucide-react";
+import { GithubIcon as Github } from "@/components/icons/BrandIcons";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Project } from "@/app/api/projects/route";
 
 interface ProjectDetailPageProps {
-  project: Project
+  project: Project;
 }
 
 export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
-  const router = useRouter()
-  const [imageLoaded, setImageLoaded] = useState(false)
+  const router = useRouter();
+  const [imageLoaded, setImageLoaded] = useState(false);
   // Default to image — iframe is opt-in since most sites block embedding via X-Frame-Options
-  const [previewMode, setPreviewMode] = useState<'image' | 'iframe'>('image')
+  const [previewMode, setPreviewMode] = useState<"image" | "iframe">("image");
 
   // Motion variants
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-  }
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
+  };
 
   return (
     <div className="relative min-h-screen bg-bg text-text overflow-x-hidden selection:bg-accent/30">
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-[20%] left-[-10%] w-[50%] h-[50%] bg-accent/3 blur-[120px] rounded-full animate-pulse-slow" />
-        <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-secondary/3 blur-[120px] rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        <div
+          className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-secondary/3 blur-[120px] rounded-full animate-pulse-slow"
+          style={{ animationDelay: "2s" }}
+        />
       </div>
 
       {/* Floating Header Navigation */}
@@ -48,14 +62,26 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
             onClick={() => router.back()}
             className="pointer-events-auto group bg-bg/20 backdrop-blur-3xl border border-dimmed/10 hover:border-accent/40 rounded-2xl px-6 py-6 text-dimmed hover:text-accent transition-all duration-500"
           >
-            <ArrowLeft size={20} className="mr-3 transition-transform group-hover:-translate-x-1" />
-            <span className="font-mono text-xs tracking-widest uppercase">Back to index</span>
+            <ArrowLeft
+              size={20}
+              className="mr-3 transition-transform group-hover:-translate-x-1"
+            />
+            <span className="font-mono text-xs tracking-widest uppercase">
+              Back to index
+            </span>
           </Button>
 
           <div className="pointer-events-auto hidden md:flex items-center gap-6 px-8 py-4 bg-bg/20 backdrop-blur-3xl border border-dimmed/10 rounded-2xl">
-            <Link href="/projects" className="text-xs font-mono tracking-widest text-dimmed hover:text-accent transition-colors">PROJECTS</Link>
+            <Link
+              href="/projects"
+              className="text-xs font-mono tracking-widest text-dimmed hover:text-accent transition-colors"
+            >
+              PROJECTS
+            </Link>
             <div className="h-1 w-1 bg-dimmed/40 rounded-full" />
-            <span className="text-xs font-mono tracking-widest text-text truncate max-w-[200px] uppercase">{project.title}</span>
+            <span className="text-xs font-mono tracking-widest text-text truncate max-w-[200px] uppercase">
+              {project.title}
+            </span>
           </div>
         </div>
       </motion.header>
@@ -76,8 +102,10 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
                     {project.category || "Case Study"}
                   </Badge>
                   <h1 className="text-6xl sm:text-7xl lg:text-9xl font-black tracking-tighter leading-[0.8] text-text">
-                    {project.title.split(' ').map((word, i) => (
-                      <span key={i} className="block">{word}</span>
+                    {project.title.split(" ").map((word, i) => (
+                      <span key={i} className="block">
+                        {word}
+                      </span>
                     ))}
                   </h1>
                 </div>
@@ -89,15 +117,25 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
 
                   <div className="flex flex-wrap gap-x-12 gap-y-6 text-sm font-mono tracking-wider">
                     <div className="space-y-1">
-                      <div className="text-dimmed/50 text-[0.6rem] uppercase">Role</div>
-                      <div className="text-text">{project.role || "Lead Developer"}</div>
+                      <div className="text-dimmed/50 text-[0.6rem] uppercase">
+                        Role
+                      </div>
+                      <div className="text-text">
+                        {project.role || "Lead Developer"}
+                      </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-dimmed/50 text-[0.6rem] uppercase">Timeline</div>
-                      <div className="text-text">{project.timeline || "2024"}</div>
+                      <div className="text-dimmed/50 text-[0.6rem] uppercase">
+                        Timeline
+                      </div>
+                      <div className="text-text">
+                        {project.timeline || "2024"}
+                      </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-dimmed/50 text-[0.6rem] uppercase">Status</div>
+                      <div className="text-dimmed/50 text-[0.6rem] uppercase">
+                        Status
+                      </div>
                       <div className="text-accent flex items-center gap-2">
                         <span className="relative flex h-2 w-2">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
@@ -110,18 +148,40 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
 
                   <div className="flex flex-wrap gap-4 pt-4">
                     {project.githubUrl && (
-                      <Button asChild size="lg" className="bg-bg/40 backdrop-blur-xl border border-dimmed/20 hover:border-accent/40 hover:bg-accent/5 text-text rounded-2xl px-8 h-16 group transition-all duration-500">
-                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                          <Github size={20} className="mr-3 group-hover:text-accent transition-colors" />
+                      <Button
+                        asChild
+                        size="lg"
+                        className="bg-bg/40 backdrop-blur-xl border border-dimmed/20 hover:border-accent/40 hover:bg-accent/5 text-text rounded-2xl px-8 h-16 group transition-all duration-500"
+                      >
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Github
+                            size={20}
+                            className="mr-3 group-hover:text-accent transition-colors"
+                          />
                           View Source Code
                         </a>
                       </Button>
                     )}
                     {project.liveUrl && (
-                      <Button asChild size="lg" className="bg-accent text-bg hover:bg-accent/90 rounded-2xl px-10 h-16 shadow-[0_20px_40px_rgba(100,255,218,0.2)] group transition-all duration-500">
-                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                      <Button
+                        asChild
+                        size="lg"
+                        className="bg-accent text-bg hover:bg-accent/90 rounded-2xl px-10 h-16 shadow-[0_20px_40px_rgba(100,255,218,0.2)] group transition-all duration-500"
+                      >
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           Visit Live Experience
-                          <ExternalLink size={20} className="ml-3 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                          <ExternalLink
+                            size={20}
+                            className="ml-3 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                          />
                         </a>
                       </Button>
                     )}
@@ -146,18 +206,30 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
 
                   <div className="mx-auto flex-1 max-w-[60%] flex justify-center">
                     <div className="w-full max-w-[300px] bg-bg/50 text-dimmed/70 text-[10px] font-mono py-1.5 px-3 rounded-md text-center border border-dimmed/10 flex items-center justify-center gap-2 truncate opacity-70 group-hover:opacity-100 transition-opacity">
-                      <span className="shrink-0"><ExternalLink size={10} className="text-emerald-500" /></span>
-                      <span className="truncate">{project.liveUrl ? project.liveUrl.replace(/^https?:\/\//, '') : `${project.title.toLowerCase().replace(/\s+/g, '-')}.local`}</span>
+                      <span className="shrink-0">
+                        <ExternalLink size={10} className="text-emerald-500" />
+                      </span>
+                      <span className="truncate">
+                        {project.liveUrl
+                          ? project.liveUrl.replace(/^https?:\/\//, "")
+                          : `${project.title.toLowerCase().replace(/\s+/g, "-")}.local`}
+                      </span>
                     </div>
                   </div>
 
                   {project.liveUrl && (
                     <div className="flex items-center absolute right-4">
                       <button
-                        onClick={() => setPreviewMode(prev => prev === 'image' ? 'iframe' : 'image')}
+                        onClick={() =>
+                          setPreviewMode((prev) =>
+                            prev === "image" ? "iframe" : "image",
+                          )
+                        }
                         className="text-[10px] uppercase font-mono tracking-wider px-3 py-1.5 rounded-full border border-dimmed/20 hover:border-accent/40 bg-bg/50 hover:bg-accent/10 hover:text-accent transition-all duration-300"
                       >
-                        {previewMode === 'image' ? 'Live Preview' : 'Close Preview'}
+                        {previewMode === "image"
+                          ? "Live Preview"
+                          : "Close Preview"}
                       </button>
                     </div>
                   )}
@@ -165,7 +237,7 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
 
                 {/* Main Content Area (Image or Iframe) */}
                 <div className="relative flex-1 bg-black/50 overflow-hidden w-full h-full">
-                  {previewMode === 'iframe' && project.liveUrl ? (
+                  {previewMode === "iframe" && project.liveUrl ? (
                     <div className="w-full h-full bg-white relative">
                       <iframe
                         src={project.liveUrl}
@@ -183,7 +255,7 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
                         src={project.image}
                         alt={project.title}
                         fill
-                        className={`object-cover object-top transition-all duration-[2s] ease-[cubic-bezier(0.2,0,0,1)] group-hover:scale-105 group-hover:object-center ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                        className={`object-cover object-top transition-all duration-[2s] ease-[cubic-bezier(0.2,0,0,1)] group-hover:scale-105 group-hover:object-center ${imageLoaded ? "opacity-100" : "opacity-0"}`}
                         onLoad={() => setImageLoaded(true)}
                         priority
                       />
@@ -210,7 +282,8 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
                     01 <div className="h-px w-12 bg-accent/30" /> DESCRIPTION
                   </h2>
                   <p className="text-2xl font-medium tracking-tight text-text leading-tight">
-                    The vision and execution behind <span className="text-accent">{project.title}</span>.
+                    The vision and execution behind{" "}
+                    <span className="text-accent">{project.title}</span>.
                   </p>
                 </div>
                 <div className="lg:col-span-8">
@@ -232,26 +305,35 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
                         key={tech}
                         className="p-6 bg-bg/20 backdrop-blur-3xl border border-dimmed/10 rounded-3xl group hover:border-accent/40 transition-all duration-500"
                       >
-                        <div className="text-dimmed/40 text-[0.6rem] font-mono mb-2">TOOL_{i.toString().padStart(2, '0')}</div>
-                        <div className="text-sm font-mono tracking-wider group-hover:text-accent transition-colors">{tech}</div>
+                        <div className="text-dimmed/40 text-[0.6rem] font-mono mb-2">
+                          TOOL_{i.toString().padStart(2, "0")}
+                        </div>
+                        <div className="text-sm font-mono tracking-wider group-hover:text-accent transition-colors">
+                          {tech}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </motion.div>
 
                 {/* Features Bento */}
-                <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.2 }}>
+                <motion.div
+                  {...fadeInUp}
+                  transition={{ ...fadeInUp.transition, delay: 0.2 }}
+                >
                   <h2 className="text-xs font-mono tracking-[0.3em] uppercase text-secondary mb-8 flex items-center gap-4">
                     03 <div className="h-px w-12 bg-secondary/30" /> FEATURES
                   </h2>
                   <div className="space-y-4">
-                    {(project.features || [
-                      'Modern and responsive user interface',
-                      'Optimized performance and fast loading times',
-                      'Cross-browser compatibility',
-                      'Mobile-first design approach',
-                      'Accessible and user-friendly experience'
-                    ]).map((feature, i) => (
+                    {(
+                      project.features || [
+                        "Modern and responsive user interface",
+                        "Optimized performance and fast loading times",
+                        "Cross-browser compatibility",
+                        "Mobile-first design approach",
+                        "Accessible and user-friendly experience",
+                      ]
+                    ).map((feature, i) => (
                       <div
                         key={i}
                         className="flex items-center gap-6 p-6 bg-bg/20 backdrop-blur-3xl border border-dimmed/10 rounded-3xl hover:border-secondary/40 transition-all duration-500 group"
@@ -259,7 +341,9 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
                         <div className="h-10 w-10 shrink-0 bg-secondary/10 border border-secondary/20 rounded-2xl flex items-center justify-center text-secondary font-mono text-xs group-hover:scale-110 transition-transform">
                           {i + 1}
                         </div>
-                        <p className="text-dimmed group-hover:text-text transition-colors">{feature}</p>
+                        <p className="text-dimmed group-hover:text-text transition-colors">
+                          {feature}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -276,21 +360,26 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
             >
               <div className="h-px w-32 bg-dimmed/10 mx-auto" />
               <div className="space-y-4">
-                <p className="text-xs font-mono tracking-widest text-dimmed uppercase">Next Exploration</p>
+                <p className="text-xs font-mono tracking-widest text-dimmed uppercase">
+                  Next Exploration
+                </p>
                 <div
                   className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tighter text-dimmed/20 hover:text-accent transition-all duration-1000 cursor-pointer select-none py-4"
-                  onClick={() => router.push('/projects')}
+                  onClick={() => router.push("/projects")}
                 >
                   DISCOVER MORE STORIES
                 </div>
               </div>
               <Button
                 variant="ghost"
-                onClick={() => router.push('/projects')}
+                onClick={() => router.push("/projects")}
                 className="group text-dimmed hover:text-accent text-sm font-mono tracking-widest uppercase"
               >
                 Back to projects collection
-                <ArrowLeft size={16} className="ml-3 rotate-180 transition-transform group-hover:translate-x-2" />
+                <ArrowLeft
+                  size={16}
+                  className="ml-3 rotate-180 transition-transform group-hover:translate-x-2"
+                />
               </Button>
             </motion.section>
           </div>
@@ -301,5 +390,5 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
       <div className="fixed top-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-accent/5 blur-[150px] rounded-full -z-10 pointer-events-none" />
       <div className="fixed bottom-[-10%] left-[-10%] w-[30vw] h-[30vw] bg-secondary/5 blur-[150px] rounded-full -z-10 pointer-events-none" />
     </div>
-  )
+  );
 }

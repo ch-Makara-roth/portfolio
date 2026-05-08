@@ -1,31 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getPostBySlug } from '@/lib/mockData'
+import { NextRequest, NextResponse } from "next/server";
+import { getPostBySlug } from "@/lib/mockData";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params;
 
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 200))
-    
-    const post = getPostBySlug(slug)
-    
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const post = getPostBySlug(slug);
+
     if (!post) {
-      return NextResponse.json(
-        { error: 'Post not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
-    
-    return NextResponse.json({ data: post })
+
+    return NextResponse.json({ data: post });
   } catch (error) {
-    console.error('Error fetching post:', error)
+    console.error("Error fetching post:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch post' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch post" },
+      { status: 500 },
+    );
   }
 }

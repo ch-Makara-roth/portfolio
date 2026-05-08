@@ -1,29 +1,32 @@
-'use client'
+"use client";
 
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import rehypeHighlight from 'rehype-highlight'
-import rehypeRaw from 'rehype-raw'
-import rehypeSlug from 'rehype-slug'
-import Image from 'next/image'
-import 'highlight.js/styles/github-dark.css'
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
+import rehypeSlug from "rehype-slug";
+import Image from "next/image";
+import "highlight.js/styles/github-dark.css";
 
 interface MarkdownRendererProps {
-  content: string
-  className?: string
+  content: string;
+  className?: string;
 }
 
 // Helper function to create URL-friendly IDs
 const createHeadingId = (text: string): string => {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-}
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim();
+};
 
-export function MarkdownRenderer({ content, className = '' }: MarkdownRendererProps) {
+export function MarkdownRenderer({
+  content,
+  className = "",
+}: MarkdownRendererProps) {
   return (
     <div className={`prose prose-invert prose-lg max-w-none ${className}`}>
       <ReactMarkdown
@@ -32,36 +35,52 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
         components={{
           // Custom heading styles with IDs
           h1: ({ children, ...props }) => {
-            const id = createHeadingId(String(children))
+            const id = createHeadingId(String(children));
             return (
-              <h1 id={id} className="text-3xl sm:text-4xl font-bold text-text mb-6 mt-8 first:mt-0 bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent scroll-mt-20" {...props}>
+              <h1
+                id={id}
+                className="text-3xl sm:text-4xl font-bold text-text mb-6 mt-8 first:mt-0 bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h1>
-            )
+            );
           },
           h2: ({ children, ...props }) => {
-            const id = createHeadingId(String(children))
+            const id = createHeadingId(String(children));
             return (
-              <h2 id={id} className="text-2xl sm:text-3xl font-semibold text-text mb-4 mt-8 first:mt-0 border-b border-dimmed/20 pb-2 scroll-mt-20" {...props}>
+              <h2
+                id={id}
+                className="text-2xl sm:text-3xl font-semibold text-text mb-4 mt-8 first:mt-0 border-b border-dimmed/20 pb-2 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h2>
-            )
+            );
           },
           h3: ({ children, ...props }) => {
-            const id = createHeadingId(String(children))
+            const id = createHeadingId(String(children));
             return (
-              <h3 id={id} className="text-xl sm:text-2xl font-semibold text-text mb-3 mt-6 first:mt-0 scroll-mt-20" {...props}>
+              <h3
+                id={id}
+                className="text-xl sm:text-2xl font-semibold text-text mb-3 mt-6 first:mt-0 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h3>
-            )
+            );
           },
           h4: ({ children, ...props }) => {
-            const id = createHeadingId(String(children))
+            const id = createHeadingId(String(children));
             return (
-              <h4 id={id} className="text-lg sm:text-xl font-semibold text-text mb-2 mt-4 first:mt-0 scroll-mt-20" {...props}>
+              <h4
+                id={id}
+                className="text-lg sm:text-xl font-semibold text-text mb-2 mt-4 first:mt-0 scroll-mt-20"
+                {...props}
+              >
                 {children}
               </h4>
-            )
+            );
           },
           // Custom paragraph styles
           p: ({ children }) => (
@@ -92,9 +111,7 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
             </ol>
           ),
           li: ({ children }) => (
-            <li className="text-base sm:text-lg leading-relaxed">
-              {children}
-            </li>
+            <li className="text-base sm:text-lg leading-relaxed">{children}</li>
           ),
           // Custom blockquote styles
           blockquote: ({ children }) => (
@@ -104,19 +121,25 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
           ),
           // Custom code styles
           code: ({ className, children, ...props }) => {
-            const isInline = !className?.includes('language-')
+            const isInline = !className?.includes("language-");
             if (isInline) {
               return (
-                <code className="bg-bg/50 text-accent px-2 py-1 rounded text-sm font-mono border border-dimmed/20" {...props}>
+                <code
+                  className="bg-bg/50 text-accent px-2 py-1 rounded text-sm font-mono border border-dimmed/20"
+                  {...props}
+                >
                   {children}
                 </code>
-              )
+              );
             }
             return (
-              <code className={`${className || ''} block bg-bg/80 p-4 rounded-lg border border-dimmed/20 overflow-x-auto text-sm`} {...props}>
+              <code
+                className={`${className || ""} block bg-bg/80 p-4 rounded-lg border border-dimmed/20 overflow-x-auto text-sm`}
+                {...props}
+              >
                 {children}
               </code>
-            )
+            );
           },
           // Custom pre styles for code blocks
           pre: ({ children }) => (
@@ -133,9 +156,7 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
             </div>
           ),
           thead: ({ children }) => (
-            <thead className="bg-bg/50">
-              {children}
-            </thead>
+            <thead className="bg-bg/50">{children}</thead>
           ),
           th: ({ children }) => (
             <th className="px-4 py-3 text-left font-semibold text-text border-b border-dimmed/20">
@@ -152,20 +173,25 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
             <hr className="border-0 h-px bg-gradient-to-r from-transparent via-dimmed/30 to-transparent my-8" />
           ),
           // Custom image styles
-          img: ({ src, alt }) => (
-            <Image
-              src={src || ''}
-              alt={alt || ''}
-              width={800}
-              height={400}
-              className="rounded-lg border border-dimmed/20 max-w-full h-auto my-6 shadow-lg"
-              style={{ width: 'auto', height: 'auto' }}
-            />
-          ),
+          img: ({ src, alt }) => {
+            if (!src) return null;
+            const imageSrc =
+              typeof src === "string" ? src : URL.createObjectURL(src);
+            return (
+              <Image
+                src={imageSrc}
+                alt={alt || ""}
+                width={800}
+                height={400}
+                className="rounded-lg border border-dimmed/20 max-w-full h-auto my-6 shadow-lg"
+                style={{ width: "auto", height: "auto" }}
+              />
+            );
+          },
         }}
       >
         {content}
       </ReactMarkdown>
     </div>
-  )
+  );
 }
