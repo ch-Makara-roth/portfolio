@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ExternalLink, Github, ArrowRight } from 'lucide-react'
+import { ExternalLink, ArrowRight } from 'lucide-react'
+import { GithubIcon as Github } from '@/components/icons/BrandIcons'
 import { Project } from '@/app/api/projects/route'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'

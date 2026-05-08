@@ -6,7 +6,11 @@
       "dom.iterable",
       "es6"
     ],
-    "types": ["jest", "@testing-library/jest-dom", "node"],
+    "types": [
+      "jest",
+      "@testing-library/jest-dom",
+      "node"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -40,7 +44,8 @@
     "jest.config.js",
     ".next/types/**/*.ts",
     "build/types/**/*.ts",
-    "public/build/types/**/*.ts"
+    "public/build/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

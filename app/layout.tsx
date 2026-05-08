@@ -1,25 +1,28 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
 import { QueryProvider } from "@/components/QueryProvider";
 import { ConditionalDockNavigation } from "@/components/ConditionalDockNavigation";
-import { generateMetadata, generateStructuredData } from "@/lib/metadata";
+import {
+  generateMetadata as generateMetadataLib,
+  generateStructuredData,
+} from "@/lib/metadata";
 import { Analytics } from "@vercel/analytics/next";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-});
+export async function generateMetadata() {
+  return generateMetadataLib({});
+}
 
-export const metadata = generateMetadata({});
+export function viewport() {
+  return {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    themeColor: "#1a1a1a",
+  };
+}
 
-export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: "#1a1a1a",
-};
+// Force dynamic rendering to avoid prerendering issues with framer-motion
+export const dynamic = "force-dynamic";
 
 export default function RootLayout({
   children,
@@ -28,7 +31,10 @@ export default function RootLayout({
 }) {
   const personStructuredData = generateStructuredData("person", {});
   const websiteStructuredData = generateStructuredData("website", {});
-  const siteNavigationStructuredData = generateStructuredData("siteNavigation", {});
+  const siteNavigationStructuredData = generateStructuredData(
+    "siteNavigation",
+    {},
+  );
 
   return (
     <html lang="en" className="dark">
@@ -62,13 +68,9 @@ export default function RootLayout({
           async
         />
       </head>
-      <body
-        className={`${inter.className} bg-bg text-text font-fira min-h-screen safe-area-inset-top safe-area-inset-bottom`}
-      >
+      <body className="bg-bg text-text font-mono min-h-screen safe-area-inset-top safe-area-inset-bottom">
         <QueryProvider>
-          <main className="safe-area-inset-top">
-            {children}
-          </main>
+          <main className="safe-area-inset-top">{children}</main>
           <ConditionalDockNavigation />
         </QueryProvider>
         <Analytics />
