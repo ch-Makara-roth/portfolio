@@ -153,7 +153,11 @@ export default function HomePage() {
         </motion.div>
 
         {/* Skills grid */}
+        <h2 id="skills-heading" className="sr-only">
+          Core skills
+        </h2>
         <motion.div
+          aria-labelledby="skills-heading"
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 max-w-4xl mx-auto px-2"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
