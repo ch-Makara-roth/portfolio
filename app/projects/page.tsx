@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { generateMetadata } from '@/lib/metadata'
 import { ProjectsPage } from '@/components/ProjectsPage'
+import { QueryProvider } from '@/components/QueryProvider'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Projects',
@@ -13,7 +14,9 @@ export default function Projects() {
     <>
       {/* Server-rendered H1 for SEO */}
       <h1 className="sr-only">Projects by Chhuon Makara Roth - Full Stack Developer Portfolio</h1>
-      <ProjectsPage />
+      <QueryProvider>
+        <ProjectsPage />
+      </QueryProvider>
     </>
   )
 }

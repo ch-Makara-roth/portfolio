@@ -1,143 +1,104 @@
-'use client'
-
-import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import ShinyText from '@/components/animations/ShinyText/ShinyText';
-import StarryBackground from '@/components/animations/StarryBackground';
+import ShinyText from '@/components/animations/ShinyText/ShinyText'
 import Link from 'next/link'
 import { ArrowRight, Mail, ChevronDown } from 'lucide-react'
 import { GithubIcon as Github, LinkedinIcon as Linkedin } from '@/components/icons/BrandIcons'
-import { useState, useEffect } from 'react';
 
 const SKILLS = [
   { category: 'Frontend', icon: '⚡', skills: 'React, Next.js, Vue, TypeScript' },
-  { category: 'Backend',  icon: '🛠️', skills: 'Node.js, Laravel, PostgreSQL' },
-  { category: 'Design',   icon: '🎨', skills: 'Figma, Tailwind CSS, Framer Motion' },
-  { category: 'DevOps',   icon: '🚀', skills: 'Docker, CI/CD, GitHub' },
-  { category: 'Mobile',   icon: '📱', skills: 'React Native,' },
+  { category: 'Backend', icon: '🛠️', skills: 'Node.js, Laravel, PostgreSQL' },
+  { category: 'Design', icon: '🎨', skills: 'Figma, Tailwind CSS, Framer Motion' },
+  { category: 'DevOps', icon: '🚀', skills: 'Docker, CI/CD, GitHub' },
+  { category: 'Mobile', icon: '📱', skills: 'React Native' },
 ]
 
 export default function HomePage() {
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center pb-24 sm:pb-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Starry Background */}
-      <StarryBackground
-        speed={0.8}
-        starCount={150}
-        nebulaColor="#4a0e4f"
-        className="z-0"
-      />
+    <section className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-4 pb-24 sm:px-6 sm:pb-28 lg:px-8">
+      {/* Static above-the-fold background: no client JS, no hydration work. */}
+      <div aria-hidden="true" className="fixed inset-0 -z-20 bg-[#0a0a0a]">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 25%, #16213e 50%, #0f3460 75%, #0a0a0a 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-60"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 20% 25%, rgba(100,255,218,0.18) 0 1px, transparent 1px), radial-gradient(circle at 80% 15%, rgba(255,255,255,0.22) 0 1px, transparent 1px), radial-gradient(circle at 50% 75%, rgba(255,121,198,0.16) 0 1px, transparent 1px)',
+            backgroundSize: '120px 120px, 180px 180px, 220px 220px',
+          }}
+        />
+        <div className="absolute inset-0 bg-black/20" />
+      </div>
 
-      {/* Overlay for text readability */}
-      <div className="absolute inset-0 bg-black/20 z-10" />
-
-      {/* Hero content */}
-      <div className="max-w-4xl w-full mx-auto text-center relative z-20 pt-24 sm:pt-28">
-
+      <div className="relative z-10 mx-auto w-full max-w-4xl pt-24 text-center sm:pt-28">
         {/* Available badge */}
-        <motion.div
-          className="flex justify-center mb-6"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/5 text-accent text-xs sm:text-sm font-medium backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+        <div className="mb-6 flex justify-center">
+          <span className="inline-flex min-h-8 items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-4 py-1.5 text-xs font-medium text-accent backdrop-blur-sm sm:text-sm">
+            <span className="relative flex h-2 w-2" aria-hidden="true">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
             </span>
             Available for work
           </span>
-        </motion.div>
+        </div>
 
-        {/* Name - H1 for SEO */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold mb-4 sm:mb-5 px-2 leading-tight">
-            <ShinyText
-              text="Chhuon Makara Roth"
-              speed={2.5}
-              className="inline"
-            />
-          </h1>
-        </motion.div>
+        {/* Name - H1 for SEO and LCP; rendered immediately on the server. */}
+        <h1 className="mb-4 px-2 text-3xl font-bold leading-tight xs:text-4xl sm:mb-5 sm:text-5xl md:text-6xl lg:text-8xl">
+          <ShinyText text="Chhuon Makara Roth" speed={2.5} className="inline" />
+        </h1>
 
         {/* Role badge */}
-        <motion.div
-          className="flex justify-center mb-5 sm:mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-        >
-          <span className="inline-block px-4 py-1.5 rounded-full border border-secondary/40 bg-secondary/10 text-secondary text-sm sm:text-base md:text-lg font-semibold tracking-wide">
+        <div className="mb-5 flex justify-center sm:mb-6">
+          <span className="inline-block min-h-8 rounded-full border border-secondary/40 bg-secondary/10 px-4 py-1.5 text-sm font-semibold tracking-wide text-secondary sm:text-base md:text-lg">
             Full Stack Developer
           </span>
-        </motion.div>
+        </div>
 
         {/* Description */}
-        <motion.p
-          className="text-sm sm:text-base md:text-lg text-text/70 mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed px-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-        >
+        <p className="mx-auto mb-8 max-w-xl px-4 text-sm leading-relaxed text-text/70 sm:mb-10 sm:text-base md:text-lg">
           I craft modern web experiences using cutting-edge technologies.
           Specializing in React, Next.js, and full-stack development.
           Based in Phnom Penh, Cambodia, I build scalable applications
           that solve real-world problems with clean, maintainable code.
-        </motion.p>
+        </p>
 
         {/* CTA Buttons */}
-        <motion.div
-          className="flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center items-center px-4 mb-6 sm:mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.8 }}
-        >
+        <div className="mb-6 flex flex-col items-center justify-center gap-3 px-4 xs:flex-row sm:mb-8 sm:gap-4">
           <Link href="/projects" className="w-full xs:w-auto">
             <Button
-              className="w-full xs:w-auto bg-accent hover:bg-accent/80 text-bg font-semibold px-7 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg shadow-accent/20 hover:shadow-accent/40"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-7 py-3 text-sm font-semibold text-bg shadow-lg shadow-accent/20 transition-all duration-200 hover:bg-accent/80 hover:shadow-accent/40 xs:w-auto sm:text-base"
               size="lg"
             >
               View Projects
-              <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <ArrowRight size={16} className="sm:h-[18px] sm:w-[18px]" />
             </Button>
           </Link>
 
           <Link href="/contact" className="w-full xs:w-auto">
             <Button
               variant="outline"
-              className="w-full xs:w-auto border-secondary/60 text-secondary hover:bg-secondary/10 hover:border-secondary px-7 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-secondary/60 px-7 py-3 text-sm text-secondary transition-all duration-200 hover:border-secondary hover:bg-secondary/10 xs:w-auto sm:text-base"
               size="lg"
             >
               Hire Me
-              <Mail size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <Mail size={16} className="sm:h-[18px] sm:w-[18px]" />
             </Button>
           </Link>
-        </motion.div>
+        </div>
 
         {/* Social links */}
-        <motion.div
-          className="flex justify-center items-center gap-4 mb-12 sm:mb-16"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.8 }}
-        >
+        <div className="mb-12 flex min-h-11 items-center justify-center gap-4 sm:mb-16">
           <a
             href="https://github.com/ch-Makara-roth"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Chhuon Makara Roth on GitHub"
-            className="p-2 rounded-full text-dimmed hover:text-accent border border-transparent hover:border-accent/30 hover:bg-accent/5 transition-all duration-200"
+            className="rounded-full border border-transparent p-2 text-dimmed transition-all duration-200 hover:border-accent/30 hover:bg-accent/5 hover:text-accent"
           >
             <Github size={20} />
           </a>
@@ -146,53 +107,41 @@ export default function HomePage() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Chhuon Makara Roth on LinkedIn"
-            className="p-2 rounded-full text-dimmed hover:text-accent border border-transparent hover:border-accent/30 hover:bg-accent/5 transition-all duration-200"
+            className="rounded-full border border-transparent p-2 text-dimmed transition-all duration-200 hover:border-accent/30 hover:bg-accent/5 hover:text-accent"
           >
             <Linkedin size={20} />
           </a>
-        </motion.div>
+        </div>
 
-        {/* Skills grid */}
+        {/* Skills grid: min-height reserves space for emoji font swaps and avoids CLS. */}
         <h2 id="skills-heading" className="sr-only">
           Core skills
         </h2>
-        <motion.div
+        <ul
           aria-labelledby="skills-heading"
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 max-w-4xl mx-auto px-2"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
+          className="mx-auto grid max-w-4xl grid-cols-2 gap-3 px-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-5"
         >
-          {SKILLS.map((skill, index) => (
-            <div
-              key={index}
-              className="group text-center p-3 sm:p-4 bg-bg/20 backdrop-blur-sm rounded-xl border border-accent/10 hover:border-accent/40 hover:bg-accent/5 hover:shadow-lg hover:shadow-accent/10 transition-all duration-300"
+          {SKILLS.map((skill) => (
+            <li
+              key={skill.category}
+              className="group flex min-h-[8.25rem] flex-col items-center justify-start rounded-xl border border-accent/10 bg-bg/20 p-3 text-center backdrop-blur-sm transition-all duration-300 hover:border-accent/40 hover:bg-accent/5 hover:shadow-lg hover:shadow-accent/10 sm:min-h-36 sm:p-4"
             >
-              <div className="text-xl mb-1.5">{skill.icon}</div>
-              <h3 className="text-accent font-semibold mb-1.5 text-xs sm:text-sm">{skill.category}</h3>
-              <p className="text-dimmed text-xs leading-relaxed">{skill.skills}</p>
-            </div>
+              <span className="mb-1.5 flex h-8 items-center justify-center text-xl leading-none" aria-hidden="true">
+                {skill.icon}
+              </span>
+              <h3 className="mb-1.5 text-xs font-semibold text-accent sm:text-sm">
+                {skill.category}
+              </h3>
+              <p className="text-xs leading-relaxed text-dimmed">{skill.skills}</p>
+            </li>
           ))}
-        </motion.div>
+        </ul>
       </div>
 
-      {/* Scroll indicator */}
-      {isClient && (
-        <motion.div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-dimmed"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.8 }}
-          aria-hidden="true"
-        >
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <ChevronDown size={24} className="text-accent/50" />
-          </motion.div>
-        </motion.div>
-      )}
-    </div>
+      {/* Scroll indicator: absolute and server-rendered to avoid client-only insertion. */}
+      <div className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-dimmed motion-safe:animate-bounce" aria-hidden="true">
+        <ChevronDown size={24} className="text-accent/50" />
+      </div>
+    </section>
   )
 }
