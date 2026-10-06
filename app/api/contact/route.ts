@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'http://localhost:5050/api/v1';
 const CONTACT_API_URL =
-  process.env.CONTACT_API_URL || "http://localhost:3001/api/v1/contact";
+  process.env.CONTACT_API_URL || `${BACKEND_BASE}/forms/contact`;
 
 // Zod schema for contact form validation
 const contactSchema = z.object({

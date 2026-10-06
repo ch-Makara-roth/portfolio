@@ -9,6 +9,7 @@ import { BlogPost } from '@/types/blog'
 import { useRecommendedPosts } from '@/hooks/useBlogQueries'
 import { Badge } from './ui/badge'
 import { MobileContainer } from './ui/mobile-responsive'
+import { getResponsiveImageUrl } from '@/lib/media'
 
 interface PostRecommendationsProps {
   currentPost: BlogPost
@@ -22,96 +23,119 @@ interface RecommendationCardProps {
 
 const RecommendationCard = ({ post, index }: RecommendationCardProps) => {
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Unknown date'
-    return new Date(dateString).toLocaleDateString('en-US', {
+    if (!dateString) return 'Recent'
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return 'Recent'
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     })
   }
 
+  const coverImg = getResponsiveImageUrl(
+    post.coverImageResponsive,
+    'desktop',
+    post.coverImage || post.image || post.imageUrl
+  )
+
+  const authorName = post.author?.name || 
+    `${post.author?.firstName || ''} ${post.author?.lastName || ''}`.trim() || 
+    post.author?.username || 
+    'Chhuon Makara Roth'
+    
+  const authorInitial = authorName.charAt(0).toUpperCase()
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
       className="group h-full"
     >
       <Link href={`/blogs/${post.slug}`} className="block h-full">
-        <article className="bg-bg/50 border border-dimmed/20 backdrop-blur-sm rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-accent/40 h-full group-hover:bg-bg/60 flex flex-col">
-          {post.image && (
-            <div className="relative h-40 sm:h-48 overflow-hidden flex-shrink-0">
+        <article className="bg-bg/40 border border-dimmed/15 backdrop-blur-sm rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 hover:border-accent/40 h-full group-hover:bg-bg/60 flex flex-col">
+          {coverImg ? (
+            <div className="relative h-40 sm:h-48 overflow-hidden flex-shrink-0 bg-bg/60">
               <Image
-                src={post.image}
+                src={coverImg}
                 alt={post.title}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
                 sizes="(max-width: 768px) 288px, 320px"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg/60 to-transparent" />
+            </div>
+          ) : (
+            <div className="relative h-40 sm:h-48 overflow-hidden flex-shrink-0 bg-gradient-to-br from-bg via-bg/80 to-accent/5 flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-accent/30" />
             </div>
           )}
-          <div className="p-4 sm:p-5 space-y-3 flex-1 flex flex-col">
-            <div className="flex items-center gap-3 text-xs text-dimmed flex-shrink-0">
-              <div className="flex items-center gap-1">
-                <Calendar size={12} />
-                <time dateTime={post.publishedAt || undefined}>
-                  {formatDate(post.publishedAt)}
-                </time>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock size={12} />
-                <span>{post.readingTime || 5} min read</span>
-              </div>
-            </div>
-            
-            <h3 className="font-bold text-text group-hover:text-accent transition-colors duration-300 line-clamp-2 text-base sm:text-lg flex-shrink-0">
-              {post.title}
-            </h3>
-            
-            <p className="text-dimmed text-xs sm:text-sm leading-relaxed line-clamp-2 group-hover:text-text/80 transition-colors duration-300 flex-1">
-              {post.excerpt}
-            </p>
-            
-            <div className="flex items-center justify-between pt-2 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-                   <span className="text-accent font-semibold text-xs">
-                     {post.author.username.charAt(0)}
-                   </span>
-                 </div>
-                <span className="text-dimmed text-xs font-medium truncate">
-                   {post.author.username}
-                 </span>
+          <div className="p-4 sm:p-5 space-y-3 flex-1 flex flex-col justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 text-xs font-mono text-dimmed flex-shrink-0">
+                <div className="flex items-center gap-1">
+                  <Calendar size={12} className="text-accent/70" />
+                  <time dateTime={post.publishedAt || post.createdAt || undefined}>
+                    {formatDate(post.publishedAt || post.createdAt)}
+                  </time>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock size={12} className="text-accent/70" />
+                  <span>{typeof post.readTime === 'string' ? post.readTime : `${post.readingTime || post.readTime || 5} min read`}</span>
+                </div>
               </div>
               
-              <div className="flex items-center gap-1 text-accent text-xs font-medium group-hover:gap-2 transition-all duration-300 flex-shrink-0">
-                <span>Read</span>
-                <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform duration-300" />
-              </div>
+              <h3 className="font-bold text-text group-hover:text-accent transition-colors duration-300 line-clamp-2 text-base sm:text-lg leading-snug">
+                {post.title}
+              </h3>
+              
+              <p className="text-dimmed text-xs sm:text-sm leading-relaxed line-clamp-2">
+                {post.excerpt}
+              </p>
             </div>
             
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 pt-2 flex-shrink-0">
-                {post.tags.slice(0, 2).map((tag: string, tagIndex: number) => (
-                  <Badge
-                    key={tagIndex}
-                    variant="secondary"
-                    className="text-xs bg-secondary/20 text-secondary border-secondary/30 hover:bg-secondary/30 transition-colors duration-300 px-2 py-1"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-                {post.tags.length > 2 && (
-                  <Badge
-                    variant="secondary"
-                    className="text-xs bg-dimmed/20 text-dimmed border-dimmed/30 px-2 py-1"
-                  >
-                    +{post.tags.length - 2}
-                  </Badge>
-                )}
+            <div className="pt-2 border-t border-dimmed/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center flex-shrink-0">
+                    <span className="text-accent font-bold text-[10px] font-mono">
+                      {authorInitial}
+                    </span>
+                  </div>
+                  <span className="text-dimmed text-xs font-mono truncate max-w-[120px]">
+                    {authorName}
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-1 text-accent text-xs font-mono font-medium group-hover:gap-2 transition-all duration-300">
+                  <span>Read</span>
+                  <ArrowRight size={12} />
+                </div>
               </div>
-            )}
+              
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {post.tags.slice(0, 2).map((tag: string, tagIndex: number) => (
+                    <Badge
+                      key={tagIndex}
+                      variant="secondary"
+                      className="text-[10px] font-mono bg-accent/10 text-accent border-accent/20 px-2 py-0.5"
+                    >
+                      #{tag}
+                    </Badge>
+                  ))}
+                  {post.tags.length > 2 && (
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] font-mono bg-dimmed/10 text-dimmed border-dimmed/20 px-1.5 py-0.5"
+                    >
+                      +{post.tags.length - 2}
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </article>
       </Link>
@@ -125,24 +149,24 @@ const LoadingSkeleton = () => (
       <div className="flex gap-4 sm:gap-6 pb-2 min-w-max">
         {[...Array(4)].map((_, index) => (
           <div key={index} className="flex-none w-72 sm:w-80">
-            <div className="bg-bg/50 border border-dimmed/20 backdrop-blur-sm rounded-xl overflow-hidden animate-pulse">
-              <div className="h-40 sm:h-48 bg-dimmed/30" />
+            <div className="bg-bg/40 border border-dimmed/15 backdrop-blur-sm rounded-2xl overflow-hidden animate-pulse">
+              <div className="h-40 sm:h-48 bg-dimmed/15" />
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-3 bg-dimmed/30 rounded w-16 sm:w-20" />
-                  <div className="h-3 bg-dimmed/30 rounded w-12 sm:w-16" />
+                  <div className="h-3 bg-dimmed/20 rounded w-16 sm:w-20" />
+                  <div className="h-3 bg-dimmed/20 rounded w-12 sm:w-16" />
                 </div>
-                <div className="h-5 sm:h-6 bg-dimmed/30 rounded w-3/4" />
+                <div className="h-5 sm:h-6 bg-dimmed/20 rounded w-3/4" />
                 <div className="space-y-2">
-                  <div className="h-3 bg-dimmed/30 rounded w-full" />
-                  <div className="h-3 bg-dimmed/30 rounded w-5/6" />
+                  <div className="h-3 bg-dimmed/15 rounded w-full" />
+                  <div className="h-3 bg-dimmed/15 rounded w-5/6" />
                 </div>
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex items-center gap-2">
-                    <div className="h-6 w-6 sm:h-8 sm:w-8 bg-dimmed/30 rounded-full" />
-                    <div className="h-3 bg-dimmed/30 rounded w-16 sm:w-20" />
+                    <div className="h-6 w-6 rounded-full bg-dimmed/20" />
+                    <div className="h-3 bg-dimmed/20 rounded w-16 sm:w-20" />
                   </div>
-                  <div className="h-3 bg-dimmed/30 rounded w-12 sm:w-16" />
+                  <div className="h-3 bg-dimmed/20 rounded w-12 sm:w-16" />
                 </div>
               </div>
             </div>
@@ -150,10 +174,6 @@ const LoadingSkeleton = () => (
         ))}
       </div>
     </div>
-    
-    {/* Scroll indicators for loading state */}
-    {/* <div className="absolute left-0 top-0 bottom-0 w-8  pointer-events-none opacity-60" />
-    <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none opacity-60" /> */}
   </div>
 )
 
@@ -164,7 +184,7 @@ const ErrorState = ({ onRetry }: { onRetry?: () => void }) => (
     className="text-center py-12"
   >
     <div className="text-dimmed mb-4">
-      <Sparkles size={48} className="mx-auto opacity-50" />
+      <Sparkles size={40} className="mx-auto opacity-50 text-accent" />
     </div>
     <h3 className="text-lg font-semibold text-text mb-2">Unable to load recommendations</h3>
     <p className="text-dimmed text-sm mb-4">
@@ -173,7 +193,7 @@ const ErrorState = ({ onRetry }: { onRetry?: () => void }) => (
     {onRetry && (
       <button
         onClick={onRetry}
-        className="text-accent hover:text-accent/80 text-sm font-medium transition-colors"
+        className="text-accent hover:text-accent/80 text-xs font-mono font-medium transition-colors border border-accent/30 rounded-lg px-3 py-1.5 hover:bg-accent/10"
       >
         Try again
       </button>
@@ -182,7 +202,8 @@ const ErrorState = ({ onRetry }: { onRetry?: () => void }) => (
 )
 
 export const PostRecommendations = ({ currentPost, className = '' }: PostRecommendationsProps) => {
-  const { data: recommendationsData, isLoading, error, refetch } = useRecommendedPosts(currentPost.id, 4)
+  const postIdOrSlug = currentPost.slug || currentPost._id || currentPost.id
+  const { data: recommendationsData, isLoading, error, refetch } = useRecommendedPosts(postIdOrSlug, 4)
   const recommendations = useMemo(() => recommendationsData?.data ?? [], [recommendationsData])
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
@@ -276,33 +297,25 @@ export const PostRecommendations = ({ currentPost, className = '' }: PostRecomme
             </h2>
           </div>
           
-          <div className="relative group ">
+          <div className="relative group">
             {showScrollIndicators && canScrollLeft && (
               <button
                 onClick={() => scroll('left')}
-                className="absolute max-sm:hidden left-2 top-1/2 -translate-y-1/2 z-10 bg-bg border border-dimmed/30 rounded-full p-2 shadow-lg hover:bg-accent/10 hover:border-accent/40 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                className="absolute max-sm:hidden left-2 top-1/2 -translate-y-1/2 z-10 bg-bg/90 border border-dimmed/30 rounded-full p-2.5 shadow-xl hover:bg-accent/10 hover:border-accent/40 transition-all duration-300 opacity-0 group-hover:opacity-100 backdrop-blur-md"
                 aria-label="Scroll left"
               >
-                <ChevronLeft size={20} className="text-text hover:text-accent transition-colors duration-300" />
+                <ChevronLeft size={18} className="text-text hover:text-accent transition-colors" />
               </button>
             )}
             
             {showScrollIndicators && canScrollRight && (
               <button
                 onClick={() => scroll('right')}
-                className="absolute max-sm:hidden right-2 top-1/2 -translate-y-1/2 z-10 bg-bg border border-dimmed/30 rounded-full p-2 shadow-lg hover:bg-accent/10 hover:border-accent/40 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                className="absolute max-sm:hidden right-2 top-1/2 -translate-y-1/2 z-10 bg-bg/90 border border-dimmed/30 rounded-full p-2.5 shadow-xl hover:bg-accent/10 hover:border-accent/40 transition-all duration-300 opacity-0 group-hover:opacity-100 backdrop-blur-md"
                 aria-label="Scroll right"
               >
-                <ChevronRight size={20} className="text-text hover:text-accent transition-colors duration-300" />
+                <ChevronRight size={18} className="text-text hover:text-accent transition-colors" />
               </button>
-            )}
-            
-            {showScrollIndicators && canScrollLeft && (
-              <div className="absolute sm:hidden left-0 top-0 bottom-0 w-8 pointer-events-none z-[5]" />
-            )}
-            
-            {showScrollIndicators && canScrollRight && (
-              <div className="absolute sm:hidden right-0 top-0 bottom-0 w-8 pointer-events-none z-[5]" />
             )}
             
             <div 
@@ -311,7 +324,7 @@ export const PostRecommendations = ({ currentPost, className = '' }: PostRecomme
             >
               <div className="flex gap-4 sm:gap-6 pb-2 min-w-max">
                 {recommendations.map((post, index) => (
-                  <div key={post.id} className="flex-none w-72 sm:w-80">
+                  <div key={post._id || post.id} className="flex-none w-72 sm:w-80">
                     <RecommendationCard post={post} index={index} />
                   </div>
                 ))}

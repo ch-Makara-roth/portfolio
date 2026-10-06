@@ -12,6 +12,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "**",
       },
+      ...(process.env.NODE_ENV === "development"
+        ? [
+            { protocol: "http", hostname: "localhost", port: "5050" },
+            { protocol: "http", hostname: "127.0.0.1", port: "5050" },
+          ]
+        : []),
     ],
     formats: ["image/webp", "image/avif"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -32,6 +38,9 @@ const nextConfig = {
   // Headers for better security and performance
   async headers() {
     const isDev = process.env.NODE_ENV === "development";
+    const devBackend = isDev
+      ? "http://localhost:5050 http://127.0.0.1:5050 ws://localhost:5050 ws://127.0.0.1:5050 "
+      : "";
     return [
       {
         source: "/(.*)",
@@ -46,7 +55,7 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com https://analytics.ahrefs.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com https://analytics.ahrefs.com https://www.google-analytics.com https://api.chhuonmakararoth.site; frame-src https://challenges.cloudflare.com;`,
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com https://analytics.ahrefs.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: ${devBackend}; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com https://analytics.ahrefs.com https://www.google-analytics.com https://api.chhuonmakararoth.site wss://api.chhuonmakararoth.site ${devBackend}; frame-src https://challenges.cloudflare.com;`,
           },
           {
             key: "Strict-Transport-Security",

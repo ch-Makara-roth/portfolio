@@ -1,11 +1,12 @@
 import "./globals.css";
-import { QueryProvider } from "@/components/QueryProvider";
 import { ConditionalDockNavigation } from "@/components/ConditionalDockNavigation";
+import { Toaster } from "@/components/ui/toast";
 import {
   generateMetadata as generateMetadataLib,
   generateStructuredData,
 } from "@/lib/metadata";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
 
 export async function generateMetadata() {
   return generateMetadataLib({});
@@ -18,9 +19,6 @@ export function viewport() {
     themeColor: "#1a1a1a",
   };
 }
-
-// Force dynamic rendering to avoid prerendering issues with framer-motion
-export const dynamic = "force-dynamic";
 
 export default function RootLayout({
   children,
@@ -60,17 +58,16 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="format-detection" content="telephone=no" />
-        <script
+        <Script
           src="https://analytics.ahrefs.com/analytics.js"
           data-key="BL3Y1qeH2bn5q10psOIeSw"
-          async
+          strategy="lazyOnload"
         />
       </head>
       <body className="bg-bg text-text font-mono min-h-screen safe-area-inset-top safe-area-inset-bottom">
-        <QueryProvider>
-          <main className="safe-area-inset-top">{children}</main>
-          <ConditionalDockNavigation />
-        </QueryProvider>
+        <main className="safe-area-inset-top">{children}</main>
+        <ConditionalDockNavigation />
+        <Toaster />
         <Analytics />
       </body>
     </html>
