@@ -265,10 +265,8 @@ describe('ContactPage', () => {
     const submitButton = screen.getByRole('button', { name: /send message/i })
     await user.click(submitButton)
 
-    await waitFor(() => {
-      expect(screen.getByText(/sending/i)).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /sending/i })).toBeDisabled()
-    })
+    expect(await screen.findByText(/sending/i)).toBeInTheDocument()
+    await waitFor(() => expect(submitButton).toBeDisabled())
 
     // Resolve the promise
     resolvePromise!({
