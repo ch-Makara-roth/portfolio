@@ -3,8 +3,26 @@
     "allow": [
       "Bash(git stash)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(bun *)",
+      "Bash(timeout *)",
+      "Bash(true)",
+      "Bash(gtimeout *)",
+      "Bash(npm *)",
+      "Bash(file *)",
+      "Bash(sed *)",
+      "Bash(tee *)",
+      "Bash(rm *)",
+      "Bash(cat *)",
+      "Bash(git checkout *)",
+      "Bash(sleep *)",
+      "Bash(then)",
+      "Bash(curl *)",
+      "Bash(kill *)",
+      "Bash(else)",
+      "Bash(fi)",
+      "Bash(grep *)"
     ]
   },
-  "$version": 3
+  "$version": 4
 }

@@ -164,7 +164,9 @@ export interface LikeResponse {
   success: boolean
   message?: string
   data: {
+    liked?: boolean
     hasLiked: boolean
+    likesCount?: number
     likes: number
   }
 }
@@ -173,7 +175,9 @@ export interface LikeStatusResponse {
   success: boolean
   message?: string
   data: {
+    liked?: boolean
     hasLiked: boolean
+    likesCount?: number
     likes: number
   }
 }

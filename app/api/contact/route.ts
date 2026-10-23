@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { cleanBaseUrl } from "@/lib/api/blogService";
 
-const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'http://localhost:5050/api/v1';
+const BACKEND_BASE = cleanBaseUrl(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'http://localhost:5050/api/v1');
 const CONTACT_API_URL =
   process.env.CONTACT_API_URL || `${BACKEND_BASE}/forms/contact`;
 

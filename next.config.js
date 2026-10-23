@@ -55,7 +55,7 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com https://analytics.ahrefs.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: ${devBackend}; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com https://analytics.ahrefs.com https://www.google-analytics.com https://api.chhuonmakararoth.site wss://api.chhuonmakararoth.site ${devBackend}; frame-src https://challenges.cloudflare.com;`,
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://challenges.cloudflare.com https://analytics.ahrefs.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: ${devBackend}; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com https://analytics.ahrefs.com https://www.google-analytics.com https://api.chhuonmakararoth.site wss://api.chhuonmakararoth.site https://portfoliobackend-alpha-self.vercel.app wss://portfoliobackend-alpha-self.vercel.app https://*.vercel.app ${devBackend}; frame-src https://challenges.cloudflare.com;`,
           },
           {
             key: "Strict-Transport-Security",

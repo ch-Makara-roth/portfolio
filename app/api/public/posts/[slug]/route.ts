@@ -1,13 +1,14 @@
 import { NextRequest } from "next/server";
+import { cleanBaseUrl } from "@/lib/api/blogService";
 
-const BASE = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "";
+const BASE = cleanBaseUrl(process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "");
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-  const url = BASE ? `${BASE}/blog/posts/${slug}` : "";
+  const url = BASE ? `${BASE}/blogs/${encodeURIComponent(slug)}` : "";
   try {
     if (url) {
       const res = await fetch(url, { next: { revalidate: 300 } });

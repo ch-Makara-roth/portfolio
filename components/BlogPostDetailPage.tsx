@@ -39,19 +39,19 @@ import { Badge } from './ui/badge'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { PostRecommendations } from './PostRecommendations'
 import { TableOfContents } from './TableOfContents'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import {
   usePost,
   useComments,
   useCreateComment,
   useLikeComment,
   usePostLikeStatus,
-  useTrackView,
   useTrackShare,
   QUERY_KEYS
 } from '@/hooks/useBlogQueries'
 import { useBlogWebSocket } from '@/hooks/useBlogWebSocket'
 import blogApiService from '@/lib/api/blogService'
+import { getBrowserFingerprint } from '@/lib/fingerprint'
 import { getResponsiveImageUrl } from '@/lib/media'
 import { toast } from './ui/toast'
 
@@ -454,17 +454,18 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
   useBlogWebSocket({ blogId: postId, slug: post?.slug || slug, enabled: !!postId || !!slug })
 
   // 2. Query reader like status
-  const { data: likeStatusData } = usePostLikeStatus(postId || slug, !!(postId || slug))
+  const { data: likeStatusData } = usePostLikeStatus(slug || postId, !!(slug || postId))
 
   const [isLiked, setIsLiked] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
+  const [viewsCount, setViewsCount] = useState<number>(0)
 
   // 3. Tracking mutations
-  const trackViewMutation = useTrackView()
   const trackShareMutation = useTrackShare()
 
   // Comments queries and mutations
   const { data: comments = [], isLoading: commentsLoading } = useComments(postId || slug)
+  const [pendingComments, setPendingComments] = useState<Comment[]>([])
   const createCommentMutation = useCreateComment()
   const likeCommentMutation = useLikeComment()
 
@@ -480,14 +481,29 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
     } catch {}
   }, [])
 
-  // Track unique view once per session
-  const viewTrackedRef = useRef(false)
+  // Track unique view on article mount
+  const viewTrackedRef = useRef<string | null>(null)
   useEffect(() => {
-    if ((postId || slug) && !viewTrackedRef.current) {
-      viewTrackedRef.current = true
-      trackViewMutation.mutate({ idOrSlug: postId || slug })
-    }
-  }, [postId, slug, trackViewMutation])
+    if (!slug || viewTrackedRef.current === slug) return
+    viewTrackedRef.current = slug
+
+    const fingerprint = getBrowserFingerprint()
+    blogApiService.trackView(slug, fingerprint)
+      .then((res) => {
+        if (res?.success && typeof res?.data?.views === 'number') {
+          setViewsCount(res.data.views)
+          queryClient.setQueryData(QUERY_KEYS.post(slug), (oldData: any) => {
+            if (!oldData) return oldData
+            const postData = oldData.data ? oldData.data : oldData
+            const updated = { ...postData, views: res.data.views }
+            return oldData.data ? { ...oldData, data: updated } : updated
+          })
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to track post view:', err)
+      })
+  }, [slug, queryClient])
 
   // Scroll Progress & Floating Dock Visibility
   useEffect(() => {
@@ -509,14 +525,19 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
     if (post) {
       const count = post.likes ?? post.likesAggregate?.likeCount ?? post._count?.likes ?? 0
       setLikesCount(count as number)
+      if (typeof post.views === 'number' && post.views > 0) {
+        setViewsCount((prev) => Math.max(prev, post.views as number))
+      }
     }
   }, [post])
 
   useEffect(() => {
     if (likeStatusData !== undefined) {
-      setIsLiked(likeStatusData.hasLiked)
-      if (typeof likeStatusData.likes === 'number') {
-        setLikesCount(likeStatusData.likes)
+      const liked = likeStatusData.hasLiked ?? likeStatusData.liked ?? false
+      setIsLiked(liked)
+      const count = likeStatusData.likesCount ?? likeStatusData.likes
+      if (typeof count === 'number') {
+        setLikesCount(count)
       }
     }
   }, [likeStatusData])
@@ -529,11 +550,12 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
   }
 
   const likeMutation = useMutation({
-    mutationFn: (action: 'toggle' | 'like' | 'unlike') => {
-      const targetId = postId || slug
-      return blogApiService.likePost(targetId, action)
+    mutationFn: (action: 'toggle' | 'like' | 'unlike' = 'toggle') => {
+      const target = slug || postId
+      const fingerprint = getBrowserFingerprint()
+      return blogApiService.likePost(target, action, fingerprint)
     },
-    onMutate: async (action) => {
+    onMutate: async (action = 'toggle') => {
       const previous = { isLiked, likesCount }
       const willBeLiked = action === 'toggle' ? !isLiked : action === 'like'
       setIsLiked(willBeLiked)
@@ -548,13 +570,21 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
     },
     onSuccess: (json) => {
       if (json?.data) {
-        setIsLiked(json.data.hasLiked)
-        setLikesCount(json.data.likes)
+        const hasLiked = json.data.hasLiked ?? json.data.liked ?? false
+        const count = json.data.likesCount ?? json.data.likes ?? 0
+        setIsLiked(hasLiked)
+        setLikesCount(count)
       }
     },
     onSettled: () => {
-      if (postId) queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post(postId) })
-      if (slug) queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post(slug) })
+      if (postId) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post(postId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.likeStatus(postId) })
+      }
+      if (slug) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post(slug) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.likeStatus(slug) })
+      }
     }
   })
 
@@ -564,8 +594,7 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
       e.stopPropagation()
     }
     if ((!postId && !slug) || likeMutation.isPending) return
-    const action: 'like' | 'unlike' = isLiked ? 'unlike' : 'like'
-    likeMutation.mutate(action)
+    likeMutation.mutate('toggle')
   }
 
   const triggerShareTracking = () => {
@@ -723,9 +752,12 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
     createCommentMutation.mutate(
       { postId: targetPostId, comment: commentData },
       {
-        onSuccess: () => {
+        onSuccess: (res: any) => {
           setNewComment('')
-          toast.success('Your comment has been submitted and is awaiting AI moderation.')
+          if (res?.data) {
+            setPendingComments((prev) => [res.data, ...prev])
+          }
+          toast.success('Your comment has been submitted and is awaiting moderation.')
         },
         onError: () => {
           toast.error('Failed to submit comment. Please try again.')
@@ -751,7 +783,10 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
     } catch {}
 
     try {
-      await createCommentMutation.mutateAsync({ postId: targetPostId, comment: commentData })
+      const res: any = await createCommentMutation.mutateAsync({ postId: targetPostId, comment: commentData })
+      if (res?.data) {
+        setPendingComments((prev) => [...prev, res.data])
+      }
       toast.success('Your reply has been submitted and is awaiting moderation.')
       return true
     } catch {
@@ -780,8 +815,14 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
     ? post.readTime
     : `${post?.readingTime || post?.readTime || 5} min read`
 
-  const commentTree = buildCommentTree(comments)
-  const commentsCount = post?.commentsCount ?? post?._count?.comments ?? comments.length
+  const allComments = useMemo(() => {
+    const existingIds = new Set(comments.map((c) => c.id || c._id))
+    const uniquePending = pendingComments.filter((p) => !existingIds.has(p.id || p._id))
+    return [...uniquePending, ...comments]
+  }, [comments, pendingComments])
+
+  const commentTree = buildCommentTree(allComments)
+  const commentsCount = (post?.commentsCount ?? post?._count?.comments ?? comments.length) + pendingComments.length
 
   if (isLoading) {
     return (
@@ -910,15 +951,11 @@ const BlogPostDetailPage = ({ slug }: { slug: string }) => {
                 <Clock size={13} className="text-accent" />
                 {readTime}
               </span>
-              {post.views !== undefined && (
-                <>
-                  <span>·</span>
-                  <span className="flex items-center gap-1">
-                    <Eye size={13} className="text-accent" />
-                    {post.views} views
-                  </span>
-                </>
-              )}
+              <span>·</span>
+              <span className="flex items-center gap-1">
+                <Eye size={13} className="text-accent" />
+                {viewsCount} views
+              </span>
             </div>
           </div>
 

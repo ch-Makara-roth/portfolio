@@ -1,4 +1,4 @@
-import blogApiService from '@/lib/api/blogService'
+import blogApiService, { cleanBaseUrl, isTokenExpired } from '@/lib/api/blogService'
 
 describe('BlogApiService', () => {
   const originalFetch = global.fetch
@@ -174,7 +174,7 @@ describe('BlogApiService', () => {
     const mockLikeResponse = {
       success: true,
       message: 'Like registered',
-      data: { hasLiked: true, likes: 243 }
+      data: { hasLiked: true, likes: 243, liked: true, likesCount: 243 }
     }
 
     global.fetch = jest.fn().mockResolvedValue({
@@ -185,10 +185,17 @@ describe('BlogApiService', () => {
     const likeRes = await blogApiService.likePost('test-post', 'like', 'custom_fp')
     expect(likeRes.data.hasLiked).toBe(true)
     expect(likeRes.data.likes).toBe(243)
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/blogs/test-post/like'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ fingerprint: 'custom_fp', action: 'like' })
+      })
+    )
 
     const mockStatusResponse = {
       success: true,
-      data: { hasLiked: true, likes: 243 }
+      data: { hasLiked: true, likes: 243, liked: true, likesCount: 243 }
     }
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
@@ -197,6 +204,87 @@ describe('BlogApiService', () => {
 
     const statusRes = await blogApiService.getLikeStatus('test-post', 'custom_fp')
     expect(statusRes.data.hasLiked).toBe(true)
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/blogs/test-post/likes?fingerprint=custom_fp'),
+      expect.anything()
+    )
+  })
+
+  test('likePost defaults to toggle and sends auth header only when logged in', async () => {
+    // 1. Unauthenticated guest
+    blogApiService.clearStoredToken()
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({
+        success: true,
+        data: { liked: true, hasLiked: true, likesCount: 15, likes: 15 }
+      })
+    })
+
+    const res1 = await blogApiService.likePost('my-post-slug', 'toggle', 'guest_fp_1')
+    expect(res1.data.hasLiked).toBe(true)
+    expect(res1.data.likes).toBe(15)
+    
+    // Check fetch options: no Authorization header
+    const guestCall = (global.fetch as jest.Mock).mock.calls[0]
+    expect(guestCall[0]).toContain('/blogs/my-post-slug/like')
+    expect(guestCall[1].headers['Authorization']).toBeUndefined()
+    expect(JSON.parse(guestCall[1].body)).toEqual({ fingerprint: 'guest_fp_1', action: 'toggle' })
+
+    // 2. Authenticated user
+    blogApiService.setStoredToken('mock-jwt-token-123')
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({
+        success: true,
+        data: { liked: false, hasLiked: false, likesCount: 14, likes: 14 }
+      })
+    })
+
+    const res2 = await blogApiService.likePost('my-post-slug', 'toggle', 'user_fp_1')
+    expect(res2.data.hasLiked).toBe(false)
+    const authCall = (global.fetch as jest.Mock).mock.calls[0]
+    expect(authCall[1].headers['Authorization']).toBe('Bearer mock-jwt-token-123')
+
+    blogApiService.clearStoredToken()
+  })
+
+  test('trackView sends POST /blogs/:idOrSlug/view with fingerprint without auth', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true, data: { views: 42 } })
+    })
+
+    const res = await blogApiService.trackView('scalable-architecture-guide', 'test_fp_42')
+    expect(res.success).toBe(true)
+    expect(res.data.views).toBe(42)
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/blogs/scalable-architecture-guide/view'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ fingerprint: 'test_fp_42' })
+      })
+    )
+  })
+
+  test('getPosts allows sorting by views and likes', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true, data: [] })
+    })
+
+    await blogApiService.getPosts({ sortBy: 'views', sortOrder: 'desc' })
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/blogs?sortBy=views&sortOrder=desc'),
+      expect.anything()
+    )
+
+    await blogApiService.getPosts({ sortBy: 'likes', sortOrder: 'desc' })
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/blogs?sortBy=likes&sortOrder=desc'),
+      expect.anything()
+    )
   })
 
   test('trackView and trackShare track metrics', async () => {
@@ -284,5 +372,26 @@ describe('BlogApiService', () => {
 
     expect(res.success).toBe(true)
     expect(res.data.id).toBe('msg_123')
+  })
+
+  test('isTokenExpired properly identifies expired vs valid tokens', () => {
+    const expiredPayload = Buffer.from(JSON.stringify({ exp: Math.floor(Date.now() / 1000) - 3600 })).toString('base64')
+    const expiredToken = `header.${expiredPayload}.sig`
+    expect(isTokenExpired(expiredToken)).toBe(true)
+
+    const validPayload = Buffer.from(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64')
+    const validToken = `header.${validPayload}.sig`
+    expect(isTokenExpired(validToken)).toBe(false)
+
+    expect(isTokenExpired(null)).toBe(true)
+    expect(isTokenExpired('non-jwt-token')).toBe(false)
+  })
+
+  test('cleanBaseUrl handles full blogs endpoint and trailing slashes', () => {
+    expect(cleanBaseUrl('https://portfoliobackend-alpha-self.vercel.app/api/v1/blogs')).toBe('https://portfoliobackend-alpha-self.vercel.app/api/v1')
+    expect(cleanBaseUrl('https://portfoliobackend-alpha-self.vercel.app/api/v1/blogs/')).toBe('https://portfoliobackend-alpha-self.vercel.app/api/v1')
+    expect(cleanBaseUrl('https://portfoliobackend-alpha-self.vercel.app/api/v1')).toBe('https://portfoliobackend-alpha-self.vercel.app/api/v1')
+    expect(cleanBaseUrl('http://localhost:5050/api/v1/')).toBe('http://localhost:5050/api/v1')
+    expect(cleanBaseUrl('')).toBe('http://localhost:5050/api/v1')
   })
 })
