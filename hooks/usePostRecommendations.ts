@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { BlogPost } from '@/types/blog'
+import { blogApiService } from '@/lib/api/blogService'
 
 interface RecommendationParams {
   currentPost: BlogPost
@@ -13,13 +14,8 @@ interface RecommendationResponse {
 }
 
 async function fetchRecommendations(currentPost: BlogPost, limit: number = 4): Promise<BlogPost[]> {
-  const response = await fetch('https://api.chhuonmakararoth.site/api/v1/blog/?page=1&limit=20')
-  if (!response.ok) {
-    throw new Error('Failed to fetch posts for recommendations')
-  }
-  
-  const result = await response.json()
-  const allPosts: BlogPost[] = result.data
+  const result = await blogApiService.getPosts({ page: 1, limit: 20 })
+  const allPosts: BlogPost[] = result.data || []
   
   const filteredPosts = allPosts.filter(post => post.id !== currentPost.id)
   
